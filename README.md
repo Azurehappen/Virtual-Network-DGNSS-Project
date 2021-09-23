@@ -115,5 +115,6 @@ PPP model usage:
 
 ## VIII. Acknowledge
 The ideas reported herein originated during a project supported by SiriusXM. The client-server implementation project was supported by Caltrans under agreement number 65A0767.
+IGGtrop_SH model data and origianl MATLAB functions are provided by the author of IGGtrop Dr. Wei Li, liwei@whigg.ac.cn.
 Some portions of the VN-DGNSS (e.g., RTCM message generator) are modifications of open-source functions in RTKLIB (https://github.com/tomojitakasu/RTKLIB).
 Functions of Spherical Harmonic expansion ionosphere correction model are modifications of functions in BNC (https://igs.bkg.bund.de/ntrip/download).
