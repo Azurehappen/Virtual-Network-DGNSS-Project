@@ -1,10 +1,10 @@
 # Virtual-Network-DGNSS-Project
 This project is the software implementation for a publicly available, open-source, client/server VN-DGNSS implementation with global coverage. The server receives real-time information in SSR format and provides each client with virtual base station RTCM OSR formatted messages applicable to their local vicinity for BeiDou B1, GALILEO E1, and GPS L1. This approach eliminates the need for the client to have physical access to a local reference station.
 
-## Paper
+## I. Paper
 (under review)
 
-## Server Setup
+## II. Server Setup
 ### System Requirement
 Ubuntu 18.04
 
@@ -62,9 +62,9 @@ cd bnc-2.12.17-ubuntu-shared
 * Click an SSR message stream (Defaul: SSR00CNE0) then click **select**.
 * Run (click **Start**) the BNC software.
 
-## Client Setup
+## III. Client Setup
 
-## System Architecture
+## IV. System Architecture
 ![Server-client](https://user-images.githubusercontent.com/45580484/131876233-beb25066-cfce-431e-8ec3-81182328b99f.png)
 
 PPP model usage:
@@ -74,7 +74,7 @@ PPP model usage:
 * Troposphere correction model: IGGtrop_SH
 
 
-## Experimental results
+## V. Experimental results
 **For detailed descriptions and conclusions, please check Sec. VI in the VN-DGNSS paper.**
 
 <img width="487" alt="Screen Shot 2021-09-02 at 11 53 19 PM" src="https://user-images.githubusercontent.com/45580484/131876595-1893578b-9f5d-4c52-b21b-2a236332e23b.png">
@@ -90,19 +90,19 @@ PPP model usage:
 * With dual-band antenna
 ![moving_DF_err](https://user-images.githubusercontent.com/45580484/133939402-ce4681fc-1a77-4f08-9cb8-79598004f1c7.jpg)
 
-## Contributor
+## VI. Contributor
 * Xiaojun Dong - [GitHub](https://github.com/Akatsukis)
 * Ashim Neupane - [GitHub](https://github.com/ashimneu)
 * Dan Vyenielo - [GitHub](https://github.com/dvnlo)
 * Farzana Rahman - [GitHub](https://github.com/FarzanaRahman)
 * Jay Farrell - [GitHub](https://github.com/jaffarrell)
 
-## Implementation Notes
+## VII. Implementation Notes
 1. The BKG data stream will provide both I/NAV and F/NAV for Galileo. In terms of IGS SSR standard, this VN-DGNSS server will only support I/NAV ephemeris. 
 2. The RTCM message function originally referred from RTKLIB but modified to our specific purpose. 
 3. No Cycle-Slip function needed since VN-DGNSS only generates the GNSS code measurements. 
 4. Note: In terms of RINEX 3.04. BDS System Time week has a roll-over after 8191. Galileo System Time (GST) week has a roll-over after 4095. currently this code doesn't consider thie roll-over since it valid to after many years. GAL week = GST week + 1024 + n*4096 (n: number of GST roll-overs).
 
-## Acknowledge
+## VIII. Acknowledge
 The ideas reported herein originated during a project supported by SiriusXM. The client-server implementation project was supported by Caltrans under agreement number 65A0767.
 Some portions of the VN-DGNSS (e.g., code measurement generator, RTCM message generator) are modifications of open-source functions in RTKLIB (https://github.com/tomojitakasu/RTKLIB) and BNC (https://igs.bkg.bund.de/ntrip/download).
