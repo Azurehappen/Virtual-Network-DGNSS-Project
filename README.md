@@ -1,6 +1,8 @@
 # Virtual-Network-DGNSS-Project
 This project is the software implementation for a publicly available, open-source, client/server VN-DGNSS implementation with global coverage. The server receives real-time information in SSR format and provides each client with virtual base station RTCM OSR formatted messages applicable to their local vicinity for BeiDou B1, GALILEO E1, and GPS L1. This approach eliminates the need for the client to have physical access to a local reference station.
 
+keywords: PPP, Differential GNSS, Lane-level positioning, Virtual Base Station
+
 ## I. Paper
 (under review)
 
