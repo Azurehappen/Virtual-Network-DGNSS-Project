@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
     runlog << local_tstr() << "Initialize u-blox type: " << UBX_TYPE
            << " (1 for M8P, 2 for ZED-F9P)." << std::endl;
   }
-  // 2. Build connection with UCR VN-DGNSS server
+  // 2. Build connection with VN-DGNSS server
   int client_fd = get_socket_fd(SERVER_ADDR, SERVER_PORT, runlog);
   if (client_fd == -1) {
     runlog << local_tstr() << "Build connection with server failed"
