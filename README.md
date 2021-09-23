@@ -3,6 +3,8 @@ This project is the software implementation for a publicly available, open-sourc
 
 keywords: PPP, Differential GNSS, Lane-level positioning, Virtual Base Station
 
+Copyright (c) 2020 UC Regents
+
 ## I. Paper
 (under review)
 
