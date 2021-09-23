@@ -18,7 +18,7 @@
 #define code_GPS_C2C    3
 #define code_GPS_C2W    4
 #define code_GPS_C2L    5
-#define MAX_CODE_GPS    5
+#define MAX_CODE_GPS    6
 
 #define code_GAL_NONE   0
 #define code_GAL_C1C    1
@@ -28,13 +28,13 @@
 #define code_GAL_C5X    5
 #define code_GAL_C7Q    6
 #define code_GAL_C7X    7
-#define MAX_CODE_GAL    7
+#define MAX_CODE_GAL    8
 
 #define code_BDS_NONE   0
 #define code_BDS_C2I    1
 #define code_BDS_C6I    2
 #define code_BDS_C7     3
-#define MAX_CODE_BDS    3
+#define MAX_CODE_BDS    4
 
 #define MAX_CODE_ELE    10
 

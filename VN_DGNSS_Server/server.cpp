@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   char const *IPaddr = argv[1];            // user input server IP
   uint16_t const port_nu = std::stoi(argv[2]);  // user input server port number
   std::ofstream serverlog;
-  serverlog.open("../../../Log/serverlog.txt",std::ios::app); // open file by append
+  serverlog.open("../Log/serverlog.txt",std::ios::app); // open file by append
   // 1.create a socket
   int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (socket_fd == -1) {
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
   // 4.Start requestor
   requestor_BKG *foo_bkg;
   requestor_web *foo_web;
-  std::string FOLDER_PATH = "../../../Log/";  // Specify the path of correction data
+  std::string FOLDER_PATH = "../Log/";  // Specify the path of correction data
   foo_bkg = new requestor_BKG(FOLDER_PATH);
   foo_web = new requestor_web(FOLDER_PATH);
   // start requesting data
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     sleep(2);
   }
   // Get empirical Trop model data
-  IGGexpModel TropData = getIGGtropData("../WADGNSS_src/IGGtropSHexpModel.ztd");
+  IGGexpModel TropData = getIGGtropData("../VN_DGNSS_src/IGGtropSHexpModel.ztd");
   // 5.wait and connect, pthread_create
   unsigned i;
   SockInfo client_info[MAXNO_CLients];  // maximum number of threads
