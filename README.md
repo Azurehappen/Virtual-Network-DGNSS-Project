@@ -70,6 +70,8 @@ cd bnc-2.12.17-ubuntu-shared
 The excutable file "VN_DGNSS_Client" for Linux (generated from Ubuntu 18.04) is located at VN_DGNSS_Client/bin.
 The excutable file "VN_DGNSS_Client.exe" for Windows (generated from Windows 10) is located at VN_DGNSS_Client/app.
 
+TODO: Details ongoing.
+
 ## IV. System Architecture
 ![Server-client](https://user-images.githubusercontent.com/45580484/131876233-beb25066-cfce-431e-8ec3-81182328b99f.png)
 
