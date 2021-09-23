@@ -3,3 +3,4 @@
 **/cmake-build-debug/
 **/.vs/
 *.DS_Store
+*.m~
