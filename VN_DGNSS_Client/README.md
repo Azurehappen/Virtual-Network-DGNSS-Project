@@ -1,5 +1,3 @@
-To start this client, please firstly read the client manual
-
 The executable file for Linux exists in the 'bin' folder
 Example command:
 ```
