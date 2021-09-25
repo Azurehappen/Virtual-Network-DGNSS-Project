@@ -11,9 +11,9 @@ The recommanded configuration are following: Set elevation cutoff for 15 degree;
 
 The following configurations are required: Enable GPS/GALILEO/BeiDou; Enable RTCM input througn USB; Enable NMEA protocol $GxGNS message. 
 
-### Server host IP, server port
+### 3. Server host IP, server port
 
-### System identifier code
+### 4. System identifier code
 This configuration is to send request to server for receiving different observation types.
 Note that the availability of observation type is determined by the SSR stream selected on the VN_DGNSS server.
 The code is formated by GPS+GALILEO+BeiDou, the default is "010101".
