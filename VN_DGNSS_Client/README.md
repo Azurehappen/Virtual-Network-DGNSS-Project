@@ -1,7 +1,7 @@
 The executable file for Linux exists in the 'bin' folder
 Example command:
 ```
-sudo ./WADGNSS_Client_Linux /dev/ttyACM0 1 192.168.1.107 3636 010101
+sudo ./VN_DGNSS_Client /dev/ttyACM0 1 192.168.1.107 3636 010101
 ```
 The executable file for Windows exists in the 'app' folder.
 You would have to input arguments for com port, option, Server host, port in Run_Client.bat file.
