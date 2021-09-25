@@ -6,8 +6,8 @@ int main(int argc, char* argv[]) {
     if (argc < 6) {
       // Rover_type: 0 for others, 1 for M8P, 2 for ZED-F9P
       std::cerr << "Not enough arguements. Please check .bat\n";
-      std::cerr << "eg: sudo ./client.o COM_PORT "
-                   "UBX_TYPE Sever_host Server_port G1E1C1"
+      std::cerr << "eg: sudo ./VN_DGNSS_Client COM_PORT "
+                 "Rover_type Server_host Server_port 010101"
                 << std::endl;
       exit(EXIT_FAILURE);
     }

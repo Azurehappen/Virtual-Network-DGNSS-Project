@@ -5,7 +5,7 @@ int main(int argc, char* argv[]) {
   if (argc < 6) {
     // Rover_type: 0 for others, 1 for M8P, 2 for ZED-F9P
     std::cerr << "Not enough arguements.\n";
-    std::cerr << "eg: sudo ./WADGNSS_Client COM_PORT "
+    std::cerr << "eg: sudo ./VN_DGNSS_Client COM_PORT "
                  "Rover_type Server_host Server_port 010101"
               << std::endl;
     exit(EXIT_FAILURE);
