@@ -100,7 +100,7 @@ PPP model usage:
 * With dual-band antenna
 ![moving_DF_err](https://user-images.githubusercontent.com/45580484/133939402-ce4681fc-1a77-4f08-9cb8-79598004f1c7.jpg)
 
-## VI. Contributor
+## VI. Code Implementation Contributor
 * Wang Hu - [GitHub](https://github.com/Azurehappen)
 * Xiaojun Dong - [GitHub](https://github.com/Akatsukis)
 * Ashim Neupane - [GitHub](https://github.com/ashimneu)
