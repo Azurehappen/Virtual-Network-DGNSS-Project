@@ -8,7 +8,9 @@ Contact: whu027@ucr.edu
 Copyright (c) 2020 UC Regents
 
 ## I. Paper
-(under review)
+Currently available at https://arxiv.org/abs/2110.14763
+
+(under journal review)
 
 ## II. Server Setup
 ### System Requirement
