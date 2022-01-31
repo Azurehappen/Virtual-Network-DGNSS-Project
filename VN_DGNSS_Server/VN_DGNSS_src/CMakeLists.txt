@@ -8,7 +8,6 @@ set(SOURCE_FILES IonoDelay.cpp SatPosClkComp.cpp
 set(HEADER_FILES IonoDelay.h SatPosClkComp.h
         geoid.h timecmn.h datagent.h data2rtcm.h SSR_VTEC.h IGGtrop.cpp IGGtrop.h)
 
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})

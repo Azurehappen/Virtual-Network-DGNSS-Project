@@ -51,6 +51,7 @@ void serial_read::posdata_reading() {
 }
 
 std::vector<double> serial_read::get_LLA_pos() {
+  std::lock_guard<std::mutex> lock(pos_mutex);
   return LLA_pos;
 }
 
