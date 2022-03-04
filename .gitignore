@@ -5,3 +5,10 @@
 *.DS_Store
 *.m~
 *.manifest
+*.arc
+*.aux
+*.bbl
+*.blg
+*.log
+*.synctex.gz
+*.ubx

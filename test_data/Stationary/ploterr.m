@@ -1,10 +1,10 @@
 addpath('../')
 warning off
-T_SFOS = readtable('SFGPS_SPS.csv');
-T_DFOS = readtable('DF_GNSSOS.csv');
-T_SFVN = readtable('SFGPS_VN_SH.csv');
-T_DFVN = readtable('DF_VN_SH.csv');
-T_DFSBAS = readtable('DF_SBAS.csv');
+T_SFOS = readtable('SF_GPS_SPS.csv');
+T_DFOS = readtable('DF_GNSS_OS.csv');
+T_SFVN = readtable('SF_GPS_VN.csv');
+T_DFVN = readtable('SF_GNSS_VN.csv');
+T_DFSBAS = readtable('F9P_SBAS.csv');
 grd = [-2430697.699;-4704189.201;3544329.103]; %ground truth
 llh_grd = [33.9750796459;
            -117.325813435195;

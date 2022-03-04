@@ -1,15 +1,15 @@
 addpath('../')
 warning off
-T_vn = readtable('VND.csv');
-T_spp = readtable('SPP.csv');
-T_sba = readtable('SBAS.csv');
-T_grd = readtable('GRD.csv');
+T_vn = readtable('SF_GNSS_VN.csv');
+T_spp = readtable('DF_GNSS_OS.csv');
+T_sba = readtable('F9P_SBAS.csv');
+T_grd = readtable('RTK.csv');
 
 % Pick start time and end time to reconcile the epoch period
 st = datetime([2021 7 1 22 15 33.000]);
 ed = datetime([2021 7 1 23 19 27.000]);
 L = seconds(ed-st)+1;
-t_x = minutes(0):seconds(1):ed - st;
+t_x = minutes(0):seconds(1):(ed - st);
 
 t_grd = T_grd.UTC;
 t_grd = datetime(t_grd,'InputFormat','HH:mm:ss.SSS MM/dd/yyyy');
@@ -261,7 +261,7 @@ set(gca,'xtick',[0.01,0.1,1,3,10]);
 set(gca,'xticklabel',{'0.01','0.1','1','3','10'});
 grid on
 
-%%
+%% Compute Probabilities
 
 T = hor_vn;
 per = length(find(T<=1.0))/length(T)
@@ -298,3 +298,96 @@ per = length(find(T<=3.0))/length(T)
 
 T = abs(ned_err_sba(3,:));
 per = length(find(T<=3.0))/length(T)
+
+%% Plot other features
+% read data
+rerun_RTK = readtable('ubx_rerun_RTK.csv');
+rerun_OS = readtable('ubx_rerun_DF_GNSS_OS.csv');
+rerun_SBAS = readtable('ubx_rerun_F9P_SBAS.csv');
+rerun_VN = readtable('ubx_rerun_SF_GNSS_VN.csv');
+t_rtk = rerun_RTK.UTC;
+t_rtk = datetime(t_rtk,'InputFormat','HH:mm:ss.SSS MM/dd/yyyy');
+st_rtk = find(t_rtk == st);
+ed_rtk = find(t_rtk == ed);
+
+t_os = rerun_OS.UTC;
+t_os = datetime(t_os,'InputFormat','HH:mm:ss.SSS MM/dd/yyyy');
+st_os = find(t_os == st);
+ed_os = find(t_os == ed);
+t_sbas = rerun_SBAS.UTC;
+t_sbas = datetime(t_sbas,'InputFormat','HH:mm:ss.SSS MM/dd/yyyy');
+st_sbas = find(t_sbas == st);
+ed_sbas = find(t_sbas == ed);
+t_vn = rerun_VN.UTC;
+t_vn = datetime(t_vn,'InputFormat','HH:mm:ss.SSS MM/dd/yyyy');
+st_vn = find(t_vn == st);
+ed_vn = find(t_vn == ed);
+% Plot speed over ground
+speed = rerun_RTK.SoG(st_rtk:ed_rtk);
+% unit: m/s to mph
+speed = speed * 3600/1609.34;
+figure
+plot(t_x,speed)
+xlabel('Epoch')
+ylabel('Speed over ground, unit: mph')
+grid on
+
+% Plot # SV used
+SVs_RTK_list = rerun_RTK.UsedSVs(st_rtk:ed_rtk);
+SVs_RTK = zeros(1,length(SVs_RTK_list));
+for i = 1:length(SVs_RTK_list)
+    SVs_RTK(i) = length(split(SVs_RTK_list{i}));
+end
+SVs_OS = rerun_OS.SVsUsed(st_os:ed_os);
+SVs_SBAS = rerun_SBAS.SVsUsed(st_sbas:ed_sbas);
+SVs_SBAS = SVs_SBAS - 3; % Remove 3 SBAS satellites
+SVs_VN = rerun_VN.SVsUsed(st_vn:ed_vn);
+
+% For same # SVs, plot for one color
+SVs_same = NaN(1,length(SVs_RTK));
+for i = 1:length(SVs_RTK)
+    if SVs_OS(i) == SVs_SBAS(i) && SVs_OS(i) == SVs_VN(i)
+        SVs_same(i) = SVs_OS(i);
+        SVs_OS(i) = NaN;
+        SVs_SBAS(i) = NaN;
+        SVs_VN(i) = NaN;
+    end
+end
+
+figure
+subplot(311)
+plot(t_x,hor_vn,'.','Color',blue)
+hold on
+plot(t_x,hor_spp,'.','Color',red)
+hold on
+plot(t_x,hor_sba,'.','Color',green)
+legend('SF GNSS VN','SF GNSS OS','F9P SBAS')
+legend('location','best');
+grid on
+axis tight
+title('(a) Horizontal Error')
+ylabel('error, meter')
+subplot(312)
+plot(t_x,speed)
+ylabel('Speed, unit: mph')
+title('(b) Speed over ground')
+axis tight
+ylim([0,70])
+grid on
+subplot(313)
+plot(t_x,SVs_VN,'.','Color',blue);
+hold on
+plot(t_x,SVs_OS,'.','Color',red);
+hold on
+plot(t_x,SVs_SBAS,'.','Color',green);
+hold on
+plot(t_x,SVs_same,'.','Color','#7E2F8E');
+hold on
+plot(t_x,SVs_RTK,'.','Color','#000000');
+grid on
+legend('SF GNSS OS','F9P SBAS','SF GNSS VN','Same #SVs','RTK')
+legend('location','best');
+xlabel('Epoch')
+axis tight
+ylim([0,25])
+title('(c) Number of Satelite used')

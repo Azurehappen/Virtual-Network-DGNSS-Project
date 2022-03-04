@@ -1,0 +1,247 @@
+
+\usepackage[papersize={8.5in,11.in},text={7.5in,9.75in}]{geometry}
+
+\usepackage{graphics}
+\usepackage{graphicx} % For including and formatting image files
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+
+\usepackage{amsmath, mathrsfs, dsfont}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bm}
+
+
+\usepackage{cite}
+\usepackage{verbatim}
+
+\usepackage{amscd}
+\usepackage{color}
+\definecolor{lgray}{gray}{0.6}
+\usepackage{rotating}
+
+
+%\usepackage[font=footnotesize]{caption}
+%\usepackage[caption=false,font=footnotesize]{subfig}
+\usepackage[font=footnotesize]{subcaption}
+
+\usepackage{mathptmx}
+\usepackage[11pt]{moresize}
+\usepackage{flushend}
+\usepackage[stable]{footmisc}
+
+\usepackage{algorithmicx}
+\usepackage{algorithm}
+\usepackage{algpascal}
+\usepackage{float}
+\usepackage{algc}
+\usepackage{algcompatible}
+\usepackage{algpseudocode}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}  % Use Input in the format of Algorithm  
+\renewcommand{\algorithmicensure}{\textbf{Output:}} % Use Output in the format of Algorithm  
+\usepackage[vcentermath]{youngtab} % For typesetting Young Tableaux
+\usepackage{url}
+%\usepackage{breakurl}   
+            
+
+%-----------------------------------------%
+% Define custom symbols
+\newcommand{\BoldA}				{ \mathbf{A} }
+\newcommand{\Bolda}				{ \mathbf{a} }
+\newcommand{\BoldB}				{ \mathbf{B} }
+\newcommand{\Boldb}				{ \mathbf{b} }
+\newcommand{\BoldC}				{ \mathbf{C} }
+\newcommand{\Boldc}				{ \mathbf{c} }
+\newcommand{\BoldD}				{ \mathbf{D} }
+\newcommand{\Boldd}				{ \mathbf{d} }
+\newcommand{\BoldE}				{ \mathbf{E} }
+\newcommand{\Bolde}				{ \mathbf{e} }
+\newcommand{\BoldF}				{ \mathbf{F} }
+\newcommand{\BoldG}				{ \mathbf{G} }
+\newcommand{\g}					{ \mathbf{g} }
+\newcommand{\BoldH}				{ \mathbf{H} }
+\newcommand{\Boldh}				{ \mathbf{h} }
+\newcommand{\BoldI}				{ \mathbf{I} }
+\newcommand{\I}					{ \mathbf{I} }
+\newcommand{\BoldJ}				{ \mathbf{J} }
+\newcommand{\BoldK}				{ \mathbf{K} }
+\newcommand{\Boldk}				{ \mathbf{k} }
+\newcommand{\BoldM}				{ \mathbf{M} }
+\newcommand{\BoldN}				{ \mathbf{N} }
+\newcommand{\Boldn}				{ \mathbf{n} }
+\newcommand{\BoldO}				{ \mathbf{O} }
+\newcommand{\BoldP}				{ \mathbf{P} }
+\newcommand{\Boldp}				{ \mathbf{p} }
+\newcommand{\BoldQ}				{ \mathbf{Q} }
+\newcommand{\Boldq}				{ \mathbf{q} }
+\newcommand{\BoldR}				{ \mathbf{R} }
+\newcommand{\R}					{ \mathbf{R} }
+\newcommand{\Boldr}				{ \mathbf{r} }
+\newcommand{\Bolds}				{ \mathbf{s} }
+\newcommand{\BoldS}				{ \mathbf{S} }
+\newcommand{\BoldT}				{ \mathbf{T} }
+\newcommand{\BoldU}				{ \mathbf{U} }
+\newcommand{\Boldu}				{ \mathbf{u} }
+\newcommand{\BoldV}				{ \mathbf{V} }
+\newcommand{\Boldv}				{ \mathbf{v} }
+\newcommand{\Boldw}				{ \mathbf{w} }
+\newcommand{\BoldW}				{ \mathbf{W} }
+\newcommand{\BoldX}				{ \mathbf{X} }
+\newcommand{\Boldx}				{ \mathbf{x} }
+\newcommand{\BoldY}				{ \mathbf{Y} }
+\newcommand{\Boldy}				{ \mathbf{y} }
+\newcommand{\BoldZ}				{ \mathbf{Z} }
+\newcommand{\Boldz}				{ \mathbf{z} }
+
+
+\newcommand{\0}					{ \boldsymbol{0} }
+\newcommand{\1}					{ \boldsymbol{1} }
+
+\newcommand{\dtheta}			{ \delta\boldsymbol{\theta} }
+\newcommand{\noiseg}			{ \mathbf{n}_{g} }
+\newcommand{\noisewg}			{ \mathbf{n}_{{\omega}g} }
+\newcommand{\noisea}			{ \mathbf{n}_{a} }
+\newcommand{\noisewa}			{ \mathbf{n}_{{\omega}a} }
+\newcommand{\Boldomega}			{ \boldsymbol{\omega} }
+\newcommand{\Boldnu}			{ \boldsymbol{\nu} }
+\newcommand{\BoldGamma}			{ \boldsymbol{\Gamma} }
+\newcommand{\Boldgamma}			{ \boldsymbol{\gamma} }
+\newcommand{\Boldkappa}			{ \boldsymbol{\kappa} }
+\newcommand{\BoldPhi}			{ \boldsymbol{\Phi} }
+\newcommand{\Boldphi}			{ \boldsymbol{\phi} }
+\newcommand{\Boldpi}			{ \boldsymbol{\pi} }
+\newcommand{\Boldrho}			{ \boldsymbol{\rho} }
+\newcommand{\Boldell}			{ \boldsymbol{\ell} }
+%\newcommand{\0}					{ \boldsymbol{0} }
+\newcommand{\Bolddelta}			{ \boldsymbol{\delta} }
+\newcommand{\BoldDelta}			{ \boldsymbol{\Delta} }
+\newcommand{\BoldTheta}			{ \boldsymbol{\Theta} }
+\newcommand{\Boldtheta}			{ \boldsymbol{\theta} }
+\newcommand{\BoldSigma}			{ \boldsymbol{\Sigma} }
+\newcommand{\Boldsigma}			{ \boldsymbol{\sigma} }
+\newcommand{\Boldeps}			{ \boldsymbol{\epsilon} }
+\newcommand{\Boldmu}			{ \boldsymbol{\mu} }
+\newcommand{\Boldeta}			{ \boldsymbol{\eta} }
+\newcommand{\Boldzeta}			{ \boldsymbol{\zeta} }
+\newcommand{\Boldlambda}		{ \boldsymbol{\lambda} }
+\newcommand{\BoldLambda}		{ \boldsymbol{\Lambda} }
+\newcommand{\Boldchi}			{ \boldsymbol{\chi} }
+
+\newcommand{\E}					{\mathrm{E}}
+\newcommand{\Var}				{\mathrm{Var}}
+\newcommand{\Cov}				{\mathrm{Cov}}
+\newcommand\norm[1]{\lVert#1\rVert}
+
+\newcommand\T{\rule{0pt}{2.6ex}}       % Top strut
+\newcommand\B{\rule[-1.2ex]{0pt}{0pt}} % Bottom strut
+
+\newcounter{inlineenum}
+\renewcommand{\theinlineenum}{\alph{inlineenum}}
+\newenvironment{inlineenum}
+{\unskip\ignorespaces\setcounter{inlineenum}{0}%
+	\renewcommand{\item}{\refstepcounter{inlineenum}{\textit{\theinlineenum})~}}}
+
+\newcommand{\icol}[1]{% inline column vector
+	\left(\begin{matrix}#1\end{matrix}\right)%
+}
+\newcommand{\irow}[1]{% inline row vector
+	\begin{matrix}(#1)\end{matrix}%
+}
+
+%-----------------------------------------%
+% Define custom operators
+\DeclareMathOperator*{\argmin}{\emph{arg\,min}}
+
+%-----------------------------------------%
+% Define custom commands
+%\newcommand{\or}{\bf or}
+%\newcommand{\and}{\bf and}
+\newtheorem{Theorem}{Theorem}[section]
+\newtheorem{Proposition}[Theorem]{Proposition}
+\newtheorem{Lemma}[Theorem]{Lemma}
+\newtheorem{Corollary}[Theorem]{Corollary}
+\newtheorem{Remark}[Theorem]{\textbf{Remark}}
+	\newcommand{\brmrk}[1]{\begin{remark} \label{#1} }
+	\newcommand{\ermrk}{ \hfill $\bigtriangleup$    \end{remark} \vspace{1mm} }
+\newtheorem{Definition}[Theorem]{Definition}
+\newtheorem{Example}[Theorem]{Example}
+\newtheorem{Conjecture}[Theorem]{Conjecture}
+\newtheorem{Problem}[Theorem]{Problem}
+\newtheorem{Algorithm}[Theorem]{Algorithm}
+\newtheorem{CardGame}[Theorem]{Card Game}
+\newtheorem{Strategy}[Theorem]{Strategy}
+\newtheorem{Question}[Theorem]{Question}
+\newtheorem{exercise}{Exercise}[section]
+\newcommand{\boex}[1]{\begin{example} \label{#1} --- \rm}
+	\newcommand{\eoex}{ \hfill $\bigtriangleup$    \end{example} \vspace{1mm} }
+\newtheorem{example}{Example}[section]
+\newcommand{\bohw}[1]{\begin{exercise} \label{#1} -- \rm}
+	\newcommand{\eohw}{ \hfill    \end{exercise} \vspace{1mm} }
+\newtheorem{assumption}{Assumption}[section]
+	\newcommand{\boass}[1]{\begin{assumption} \label{#1} -- \rm}
+	\newcommand{\eoass}{ \hfill    \end{assumption} \vspace{1mm} }
+
+\newcommand{\todo}[1]{\footnote{\color{green}TO DO: {#1}}}
+
+\newcommand{\tstamp}{\today}
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\headheight 35pt
+
+%\rhead{\tstamp}
+%\chead{Middle top}
+%\lhead{Left top}
+%\rfoot{p. \thepage}
+%\cfoot{}
+%\lfoot{Copyright \textcopyright 2019, University of California, Riverside. All Rights reserved.}
+
+\renewcommand{\baselinestretch}{1.0}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+\newcommand{\black}{\color{black}}
+\newcommand{\blue}{\color{blue}}
+\newcommand{\red}{\color{red}}
+\newcommand{\green}{\color{green}}
+\newcommand{\magenta}{\color{magenta}}
+\newcommand{\cyan}{\color{cyan}}
+\definecolor{brinkpink}{rgb}{1.00, 0.33, 0.64}
+\newcommand{\pink}{\color{brinkpink}}
+
+%\newcommand{\black}{\color{black}}
+%\newcommand{\blue}{\color{black}}
+%\newcommand{\red}{\color{black}}
+%\newcommand{\green}{\color{black}}
+%\newcommand{\magenta}{\color{black}}
+
+\makeatletter
+\newenvironment{breakablealgorithm}
+{% \begin{breakablealgorithm}
+	\begin{center}
+		\refstepcounter{algorithm}% New algorithm
+		\hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+		\renewcommand{\caption}[2][\relax]{% Make a new \caption
+			{\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
+			\ifx\relax##1\relax % #1 is \relax
+			\addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+			\else % #1 is not \relax
+			\addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+			\fi
+			\kern2pt\hrule\kern2pt
+		}
+	}{% \end{breakablealgorithm}
+		\kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+	\end{center}
+}
+\makeatother
+
+
+
+
+
+
+
