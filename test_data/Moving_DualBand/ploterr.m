@@ -391,3 +391,12 @@ xlabel('Epoch')
 axis tight
 ylim([0,25])
 title('(c) Number of Satelite used')
+
+%% Plot trajectory
+st_ = find(t_grd == st);
+ed_ = find(t_grd == ed);
+lat_grd = T_grd.Lat(st_:ed_);
+lon_grd = T_grd.Lon(st_:ed_);
+figure
+geoplot(lat_grd,lon_grd)
+geobasemap streets

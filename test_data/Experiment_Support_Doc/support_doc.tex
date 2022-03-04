@@ -16,12 +16,61 @@
 	\section{Moving test}
 	For the moving tests, the raw data was stored as `.ubx' files using u-center software. The data file are available at the open source repository. The files are named according to the acronyms defined in Table IV of the paper. The files name as `RTK' is the receiver which was operating RTK and used as ground truth trajectory. Since the receivers were all connected to the same antenna, the experiment surroundings conditions are same for all receivers. By rerunning the `.ubx' file using u-center, the results for moving tests will be discussed. The sky plot is from F9P SBAS data, since this operation can show all the satellite which can be tracked. The sky plot for receivers using VN-DGNSS approach do not have SBAS satellites. The sky plot for receivers using RTK do not have SBAS and GALILEO satellites since u-blox M8P do not support them. The vehicle speed plots are based on the results from RTK. The plots for the number of satellite used are shown by all receivers, since different setup results in different satellite usage scenarios. The elevation angle cutoff for all receivers was set by 15$^\circ$.
 	
+	Fig. \ref{fig:trj_mt1} and Fig. \ref{fig:trj_mt2} show the vehicle trajectory for the moving test using single band and dual band antenna, respectively.
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{.5\textwidth}
+			\includegraphics[width=\linewidth]{figures/trajectory_single.eps}
+			\caption{Vehicle trajectory for moving test using single band antenna.}
+			\label{fig:trj_mt1}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\includegraphics[width=\linewidth]{figures/trajectory_dual.eps}
+			\caption{Vehicle trajectory for moving test using dual band antenna.}
+			\label{fig:trj_mt2}
+		\end{subfigure}
+		\caption[short]{Vehicle trajectory for moving test.}
+		\label{fig:trj}
+	\end{figure}
 	
-	Fig. \ref{fig:mt1_sky} and Fig. \ref{fig:mt2_sky}  show the sky plots with satellite ID at its last destination. Each satellite includes system symbol and its identifier. `G' stands for GPS, `E' stands for GALILEO, `B' stands for BeiDou. Fig. \ref{fig:mt1_obt} and Fig. \ref{fig:mt2_obt} show more clear satellite orbits without the satellite ID. The green orbit or satellite indicates satellite was used in navigation. The cyan color indicates satellite signal available but not used (In this implementation, they were not used because satellite elevation lower than elevation cutoff angle). The blue color indicates satellite signal available but not available for use in navigation. The red color indicates satellites signal not available. There are several reasons will cause color blue and red, such as unhealthy status reported by satellite, lack of ephemeris, low signal strength, below elevation cutoff angle setup, and so on \cite{ucenter}. 
+	Fig. \ref{fig:mt1_sky} and Fig. \ref{fig:mt2_sky} show the sky plots with satellite ID at its last destination. Each satellite includes system symbol and its identifier. `G' stands for GPS, `E' stands for GALILEO, `B' stands for BeiDou. Fig. \ref{fig:mt1_obt} and Fig. \ref{fig:mt2_obt} show more clear satellite orbits without the satellite ID. The green orbit or satellite indicates satellite was used in navigation. The cyan color indicates satellite signal available but not used (In this implementation, they were not used because satellite elevation lower than elevation cutoff angle). The blue color indicates satellite signal available but not available for use in navigation. The red color indicates satellites signal not available. There are several reasons will cause color blue and red, such as unhealthy status reported by satellite, lack of ephemeris, low signal strength, below elevation cutoff angle setup, and so on \cite{ucenter}. 
 	
-	There are some orbits in both Fig. \ref{fig:mt1} and Fig. \ref{fig:mt2} have different colors shift between available status and unavailable status, such as B21, E5, G24 in Fig. \ref{fig:mt1}. When the satellites at low elevation and the vehicle is moving, the receiver may lose tracking the satellites blocked by high buildings or trees. 
+	There are some orbits in both Fig. \ref{fig:mt1} and Fig. \ref{fig:mt2} have different colors shift between available status and unavailable status, such as B21, E5, and G24 in Fig. \ref{fig:mt1}. When the satellites at low elevation and the vehicle is moving, the receiver may lose tracking the satellites blocked by high buildings or trees. 
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{.45\textwidth}
+			\includegraphics[width=\linewidth]{../Moving_SingleBand/skyplot.png}
+			\caption{With satellite ID.}
+			\label{fig:mt1_sky}
+		\end{subfigure}%
+		\begin{subfigure}{.45\textwidth}
+			\includegraphics[width=\linewidth]{../Moving_SingleBand/skyplot_orbit.png}
+			\caption{	Without satellite ID.}
+			\label{fig:mt1_obt}
+		\end{subfigure}
+		\caption[short]{Sky plot and satellite orbit for moving test using single band antenna.}
+		\label{fig:mt1}
+	\end{figure}
+
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{.5\textwidth}
+			\includegraphics[width=0.9\linewidth]{../Moving_DualBand/skyplot.png}
+			\caption{	
+				With satellite ID.}
+			\label{fig:mt2_sky}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\includegraphics[width=0.9\linewidth]{../Moving_DualBand/skyplot_orbit.png}
+			\caption{	
+				Without satellite ID.}
+			\label{fig:mt2_obt}
+		\end{subfigure}
+		\caption[short]{Sky plot and satellite orbit for moving test using dual band antenna.}
+		\label{fig:mt2}
+	\end{figure}
 	
-	Fig. \ref{fig:m1vspeed} (a) and Fig. \ref{fig:m2vspeed} (a) show the horizontal error for moving test, the analysis can be found at the original paper. Fig. \ref{fig:m1vspeed} (b) and Fig. \ref{fig:m2vspeed} (b) show the vehicle speed over ground. Fig. \ref{fig:m1vspeed} (c) and Fig. \ref{fig:m2vspeed} (c) show the number of satellites used in navigation. The colors are marked based on the operation used in the experiment, the definition of these acronyms can be founded at the Table IV from the original paper. The purple line means the SF GNSS OS, F9P SBAS, SF GNSS VN have the same number of satellites used. Most case they have the same number but have exceptions which colored as blue, red and green. According to the ublox ZED-F9P Interface Description document, the satellite will be used only when code and carrier locked achieved and time synchronized. Fig. \ref{fig:ubxqi} shows an example of the satellite information interface from u-center. The column 'Qi' is the signal quality indicator. The description of `Qi' is followed by Table \ref{tab:qi}. `Qi' change from 7 to other values refers to cycle slip. Cycle slip can be caused by obstructions, such as buildings and trees, that are solid so that resulting in deep rapid signal fading \cite{sennott1992use}. When the receiver detect the cycle slip for a satellite, it will not used this satellite for positioning.
+	Fig. \ref{fig:m1vspeed}a and Fig. \ref{fig:m2vspeed}a show the horizontal error for moving test, the analysis can be found at the original paper. Fig. \ref{fig:m1vspeed}b and Fig. \ref{fig:m2vspeed}b show the vehicle speed over ground. Fig. \ref{fig:m1vspeed}c and Fig. \ref{fig:m2vspeed}c show the number of satellites used in navigation. The colors are marked based on the operation used in the experiment, the definition of these acronyms can be founded at the Table IV from the original paper. The purple line means the SF GNSS OS, F9P SBAS, SF GNSS VN have the same number of satellites used. Most case they have the same number but have exceptions which colored as blue, red and green. According to the ublox ZED-F9P Interface Description document, the satellite will be used only when code and carrier locked achieved and time synchronized. Fig. \ref{fig:ubxqi} shows an example of the satellite information interface from u-center. The column 'Qi' is the signal quality indicator. The description of `Qi' is followed by Table \ref{tab:qi}. `Qi' change from 7 to other values refers to cycle slip. Cycle slip can be caused by obstructions, such as buildings and trees, that are solid so that resulting in deep rapid signal fading \cite{sennott1992use}. When the receiver detect the cycle slip for a satellite, it will not used this satellite for positioning.
 	
 	\begin{table}[H]
 		\centering
@@ -43,48 +92,14 @@
 	
 	\begin{figure}[H]
 		\centering
-		\begin{subfigure}{.5\textwidth}
-			\includegraphics[width=0.9\linewidth]{../Moving_SingleBand/skyplot.png}
-			\caption{With satellite ID.}
-			\label{fig:mt1_sky}
-		\end{subfigure}%
-		\begin{subfigure}{.5\textwidth}
-			\includegraphics[width=0.9\linewidth]{../Moving_SingleBand/skyplot_orbit.png}
-			\caption{	Without satellite ID.}
-			\label{fig:mt1_obt}
-		\end{subfigure}
-		\caption[short]{Sky plot and satellite orbit for moving test using single band antenna.}
-		\label{fig:mt1}
-	\end{figure}
-	
-	\begin{figure}[H]
-		\centering
-		\includegraphics[width=\textwidth]{figures/dynamicinfo_single.eps}
+		\includegraphics[width=0.9\textwidth]{figures/dynamicinfo_single.eps}
 		\caption{Vehicle speed and number of satellites used for moving test using single band antenna.}
 		\label{fig:m1vspeed}
-	\end{figure}
-	
-	\begin{figure}[H]
-		\centering
-		\begin{subfigure}{.5\textwidth}
-			\includegraphics[width=0.9\linewidth]{../Moving_DualBand/skyplot.png}
-			\caption{	
-				With satellite ID.}
-			\label{fig:mt2_sky}
-		\end{subfigure}%
-		\begin{subfigure}{.5\textwidth}
-			\includegraphics[width=0.9\linewidth]{../Moving_DualBand/skyplot_orbit.png}
-			\caption{	
-				Without satellite ID.}
-			\label{fig:mt2_obt}
-		\end{subfigure}
-		\caption[short]{Sky plot and satellite orbit for moving test using dual band antenna.}
-		\label{fig:mt2}
 	\end{figure}
 
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=\textwidth]{figures/dynamicinfo_dual.eps}
+		\includegraphics[width=0.9\textwidth]{figures/dynamicinfo_dual.eps}
 		\caption{Vehicle speed and number of satellites used for moving test using dual band antenna.}
 		\label{fig:m2vspeed}
 	\end{figure}

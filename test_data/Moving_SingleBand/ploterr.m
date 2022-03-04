@@ -412,3 +412,12 @@ grid on
 legend('RTK','SF GNSS OS','F9P SBAS','SF GNSS VN')
 xlabel('Epoch')
 ylabel('3D accuracy estimated by u-blox receiver')
+
+%% Plot trajectory
+st_ = find(t_grd == st);
+ed_ = find(t_grd == ed);
+lat_grd = T_grd.Lat(st_:ed_);
+lon_grd = T_grd.Lon(st_:ed_);
+figure
+geoplot(lat_grd,lon_grd)
+geobasemap streets
