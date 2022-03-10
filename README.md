@@ -15,7 +15,7 @@ Currently available at https://arxiv.org/abs/2110.14763
 ## II. Server Setup
 ### System Requirement
 Ubuntu 18.04
-
+#### Attention: The executable file provided here was compiled from X86 Linux. If you are using ARM or other architecture, you should compile this project before using it.
 ### Setup
 Compiling packages are needed: gcc, g++, cmake. If not, do "sudo apt install xxx".
 
