@@ -8,10 +8,12 @@
 	}
 	\maketitle
 	
+
 	This support document provides additional information related those experiments that could not fit within the page constraints of VN-DGNSS paper \cite{hu2021using}.
 	
 	\section{Stationary test}
 	For the stationary test, all the receivers were connected to a high quality antenna mounted on the roof of Winston Chung Hall at the University of California, Riverside. That antenna location was determined by Online Positioning User Service (OPUS). This antenna is located on the roof of Winston Chung Hall at the University of California, Riverside. The antenna has a clear view of the open sky. The elevation angle cutoff for all receivers was set by 15$^\circ$. For a long duration test, to analyze position estimation accuracy, UTC time, geodetic and geocentric coordinates were saved using u-center software. The underlying u-blox raw data (e.g., measurements, satellite status) were not saved.
+
 	
 	\section{Moving test}
 	For the moving tests, the raw data was stored as `.ubx' files using u-center software. The data file are available in the `test\_data' folder at the open-source repository \footnote{VN-DGNSS repository: \url{https://github.com/Azurehappen/Virtual-Network-DGNSS-Project}.}. The files are named according to the acronyms defined in Table IV of the paper \cite{hu2021using}. The files that are named as `RTK' are those for which the receiver was operating ground truth trajectory. The elevation angle cutoff for all receivers was set by 15$^\circ$. During the experiment, the u-blox RTK status always maintained integer fixed solution.
