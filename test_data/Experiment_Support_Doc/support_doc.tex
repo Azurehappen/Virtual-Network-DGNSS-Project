@@ -8,10 +8,13 @@
 	}
 	\maketitle
 	
-	The VN-DGNSS paper \cite{hu2021using} analyzed the positioning performance of the VN-DGNSS approach. This support document provides more experiment scenarios and dynamic conditions.
+	The VN-DGNSS paper \cite{hu2021using} analyzed the positioning performance of the VN-DGNSS approach. This support document provides more experiment scenarios and discusses details of the dynamic conditions.
 	
 	\section{Stationary test}
-	For the stationary test, all the receivers were connected to the UCR base station antenna and its position is known. This antenna is located on the roof of Winston Chung Hall at the University of California, Riverside. The antenna has a clear view of the open sky, and the elevation angle cutoff for all receivers was set by 15$^\circ$. For a long period test, we didn't record the u-blox raw data. Based on the purpose of investigating positioning performance, we stored the outputs for UTC, Latitude, Longitude, Altitude, and ECEF coordinates by using u-center software.
+	For the stationary test, all the receivers were connected to the UCR base station antenna and its position is known. 
+	This antenna is located on the roof of Winston Chung Hall at the University of California, Riverside. 
+	The antenna has a clear view of the open sky, and the elevation angle cutoff for all receivers was set by 15$^\circ$. 
+	For a long period test, we didn't record the u-blox raw data. Based on the purpose of investigating positioning performance, we stored the outputs for UTC, Latitude, Longitude, Altitude, and ECEF coordinates by using u-center software.
 	
 	\section{Moving test}
 	For the moving tests, the raw data was stored as `.ubx' files using u-center software. The data file are available at the open-source repository. The files are named according to the acronyms defined in Table IV of the paper \cite{hu2021using}. The files are named as `RTK' is the receiver which was operating RTK and used as ground truth trajectory. Since the receivers were all connected to the same antenna, the experiment surroundings conditions are the same for all receivers. By rerunning the `.ubx' file using u-center, the results for moving tests will be discussed. The sky plot is from F9P SBAS data since this operation can show all the satellites which can be tracked. The receivers using the VN-DGNSS approach do not use SBAS satellites. The receivers using RTK do not have SBAS and GALILEO satellites since u-blox M8P does not support them. The vehicle speed plots are based on the results from RTK. The plots for the number of satellites used are shown by all receivers since different setup results in different satellite usage scenarios. The elevation angle cutoff for all receivers was set by 15$^\circ$. During the experiment, the u-blox RTK status is always integer fixed solution.
