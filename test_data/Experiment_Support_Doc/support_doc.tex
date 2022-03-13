@@ -85,7 +85,9 @@
 		\item The `PR used' indicate that if the satellite code measurement is used, Y for yes and N for no.
 	\end{itemize}
 	
-	When the satellite signal fades or is blocked by obstructions, such as buildings and trees, the receiver will lose tracking of the signal and the signal quality indicator will be changed to code unlocked statuses ($Qi = 0,1,2,3$). \red Fig. (not yet plotted) \black and the attached video show the Qi of satellite E3 was dropped from 7 to 0 when signal lost, and then back to 7 when the receiver re-lock the satellite. `Qi' change from 7 to other values refers to cycle slip. Cycle slip can be caused by deep rapid signal fading \cite{sennott1992use}. When the receiver detects the cycle slip for a satellite, it will not use this satellite for RTK positioning.
+	When the satellite signal fades or is blocked by obstructions, such as buildings and trees, the receiver will lose tracking of the signal and the signal quality indicator will be changed to code unlocked statuses ($Qi = 0,1,2,3$). Fig. \ref{fig:qi} and the attached video show the Qi of satellite E3 was dropped from 7 to 0 when signal lost, and then back to 7 when the receiver re-lock the satellite. In Fig. \ref{fig:qi}b, the E3 is not used when $Qi \geq 4$. This changes reflect to the total number of satellite used shown in Fig. \ref{fig:qi}a.
+	
+	`Qi' change from 7 to other values refers to cycle slip. Cycle slip can be caused by deep rapid signal fading \cite{sennott1992use}. When the receiver detects the cycle slip for a satellite, it will not use this satellite for RTK positioning.
 	
 	The number of satellites used in RTK is less than others is because the u-blox M8P does not support the GALILEO system.
 	
@@ -119,6 +121,13 @@
 		\includegraphics[width=0.9\textwidth]{figures/dynamicinfo_dual.eps}
 		\caption{Vehicle speed and number of satellites used for moving test using dual band antenna.}
 		\label{fig:m2vspeed}
+	\end{figure}
+
+	\begin{figure}[H]		
+		\centering		
+		\includegraphics[width=0.9\textwidth]{figures/Qi.eps}		
+		\caption{An example of signal quality indicator corresponding to satellite usage status.}		
+		\label{fig:qi}	
 	\end{figure}
 
     \bibliographystyle{ieeetr}

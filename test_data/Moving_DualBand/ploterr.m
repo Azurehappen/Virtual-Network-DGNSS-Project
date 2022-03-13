@@ -405,16 +405,29 @@ geoplot(lat_grd,lon_grd)
 geobasemap streets
 
 %% Sat dropp
+qi = [7,7,7,5,4,0,3,4,7,7,7,7,7];
 t_d = t_x(373:385);
+svs = SVs_SBASd(373:385);
 figure
-plot(t_d,SVs_OSd(373:385),'Color',blue);
-hold on
-plot(t_d,SVs_SBASd(373:385),'Color',red);
-hold on
-plot(t_d,SVs_VNd(373:385),'Color',green);
+subplot(211)
+plot(t_d,svs,'.','Color',green);
 grid on
-legend('DF GNSS OS','F9P SBAS','SF GNSS VN','Same #SVs','RTK')
+xlabel('Epoch')
+title('(a) Number of satellite used in F9P SBAS')
+axis tight
+ylim([20,25])
+subplot(212)
+plot(t_d(1:5),qi(1:5),'.','Color',green);
+hold on
+plot(t_d(6:7),qi(6:7),'.','Color',red);
+hold on
+plot(t_d(8:end),qi(8:end),'.','Color',green);
+grid on
+legend('Used','Not used')
 legend('location','best');
 xlabel('Epoch')
 axis tight
-ylim([0,25])
+ylabel('Qi')
+grid on
+ylim([0,8])
+title('(b) Signal quality indicator for E3')
