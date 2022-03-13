@@ -1,3 +1,4 @@
+clear all
 addpath('../')
 warning off
 T_vn = readtable('SF_GNSS_VN.csv');
@@ -342,7 +343,9 @@ SVs_OS = rerun_OS.SVsUsed(st_os:ed_os);
 SVs_SBAS = rerun_SBAS.SVsUsed(st_sbas:ed_sbas);
 SVs_SBAS = SVs_SBAS - 3; % Remove 3 SBAS satellites
 SVs_VN = rerun_VN.SVsUsed(st_vn:ed_vn);
-
+SVs_OSd = SVs_OS;
+SVs_SBASd = SVs_SBAS;
+SVs_VNd = SVs_VN;
 % For same # SVs, plot for one color
 SVs_same = NaN(1,length(SVs_RTK));
 for i = 1:length(SVs_RTK)
@@ -361,7 +364,7 @@ hold on
 plot(t_x,hor_spp,'.','Color',red)
 hold on
 plot(t_x,hor_sba,'.','Color',green)
-legend('SF GNSS VN','SF GNSS OS','F9P SBAS')
+legend('SF GNSS VN','DF GNSS OS','F9P SBAS')
 legend('location','best');
 grid on
 axis tight
@@ -385,7 +388,7 @@ plot(t_x,SVs_same,'.','Color','#7E2F8E');
 hold on
 plot(t_x,SVs_RTK,'.','Color','#000000');
 grid on
-legend('SF GNSS OS','F9P SBAS','SF GNSS VN','Same #SVs','RTK')
+legend('SF GNSS VN','DF GNSS OS','F9P SBAS','Same #SVs','RTK')
 legend('location','best');
 xlabel('Epoch')
 axis tight
@@ -400,3 +403,18 @@ lon_grd = T_grd.Lon(st_:ed_);
 figure
 geoplot(lat_grd,lon_grd)
 geobasemap streets
+
+%% Sat dropp
+t_d = t_x(373:385);
+figure
+plot(t_d,SVs_OSd(373:385),'Color',blue);
+hold on
+plot(t_d,SVs_SBASd(373:385),'Color',red);
+hold on
+plot(t_d,SVs_VNd(373:385),'Color',green);
+grid on
+legend('DF GNSS OS','F9P SBAS','SF GNSS VN','Same #SVs','RTK')
+legend('location','best');
+xlabel('Epoch')
+axis tight
+ylim([0,25])

@@ -8,17 +8,15 @@
 	}
 	\maketitle
 	
-	The VN-DGNSS paper \cite{hu2021using} analyzed the positioning performance of the VN-DGNSS approach. This support document provides more experiment scenarios and discusses details of the dynamic conditions.
+
+	This support document provides additional information related those experiments that could not fit within the page constraints of VN-DGNSS paper \cite{hu2021using}.
 	
 	\section{Stationary test}
-	For the stationary test, all the receivers were connected to the UCR base station antenna and its position is known. 
-	This antenna is located on the roof of Winston Chung Hall at the University of California, Riverside. 
-	The antenna has a clear view of the open sky, and the elevation angle cutoff for all receivers was set by 15$^\circ$. 
-	For a long period test, we didn't record the u-blox raw data. Based on the purpose of investigating positioning performance, we stored the outputs for UTC, Latitude, Longitude, Altitude, and ECEF coordinates by using u-center software.
+	For the stationary test, all the receivers were connected to a high quality antenna mounted on the roof of Winston Chung Hall at the University of California, Riverside. That antenna location was determined by Online Positioning User Service (OPUS). This antenna is located on the roof of Winston Chung Hall at the University of California, Riverside. The antenna has a clear view of the open sky. The elevation angle cutoff for all receivers was set by 15$^\circ$. For a long duration test, to analyze position estimation accuracy, UTC time, geodetic and geocentric coordinates were saved using u-center software. The underlying u-blox raw data (e.g., measurements, satellite status) were not saved.
+
 	
 	\section{Moving test}
-	For the moving tests, the raw data was stored as `.ubx' files using u-center software. The data file are available at the open-source repository. The files are named according to the acronyms defined in Table IV of the paper \cite{hu2021using}. The files are named as `RTK' is the receiver which was operating RTK and used as ground truth trajectory. Since the receivers were all connected to the same antenna, the experiment surroundings conditions are the same for all receivers. By rerunning the `.ubx' file using u-center, the results for moving tests will be discussed. The sky plot is from F9P SBAS data since this operation can show all the satellites which can be tracked. The receivers using the VN-DGNSS approach do not use SBAS satellites. The receivers using RTK do not have SBAS and GALILEO satellites since u-blox M8P does not support them. The vehicle speed plots are based on the results from RTK. The plots for the number of satellites used are shown by all receivers since different setup results in different satellite usage scenarios. The elevation angle cutoff for all receivers was set by 15$^\circ$. During the experiment, the u-blox RTK status is always integer fixed solution.
-	
+	For the moving tests, the raw data was stored as `.ubx' files using u-center software. The data file are available in the `test\_data' folder at the open-source repository \footnote{VN-DGNSS repository: \url{https://github.com/Azurehappen/Virtual-Network-DGNSS-Project}.}. The files are named according to the acronyms defined in Table IV of the paper \cite{hu2021using}. The files that are named as `RTK' are those for which the receiver was operating ground truth trajectory. The elevation angle cutoff for all receivers was set by 15$^\circ$. During the experiment, the u-blox RTK status always maintained integer fixed solution.
 	Fig. \ref{fig:trj_mt1} and Fig. \ref{fig:trj_mt2} show the vehicle trajectory for the moving test using single-band and dual-band antenna, respectively.
 	\begin{figure}[H]
 		\centering
@@ -36,6 +34,11 @@
 		\label{fig:trj}
 	\end{figure}
 	
+	Since the receivers were all connected to the same antenna, the effects of the experiment at surroundings are the same for all receivers. 
+	%By rerunning the `.ubx' file using u-center, the results for moving tests will be discussed. 
+	The sky plots in Fig. \ref{fig:mt1} and \ref{fig:mt2} show the satellites were tracked from the F9P SBAS experiment. \red The receivers using the VN-DGNSS approach do not use SBAS satellites. The receivers using RTK do not have SBAS and GALILEO satellites since u-blox M8P does not support them. \footnote{\red Not sure how to revise that, these are not new discussion. Basically, Fig 2 and 3 from F9P SBAS can show all the sky scenarios for the test duration. But VN-DGNSS and RTK can not because some system are disabled. There is not need to display all the result for them, because the experiment at surroundings are the same for all receivers.}
+	\black
+	
 	Fig. \ref{fig:mt1_sky} and Fig. \ref{fig:mt2_sky} show the sky plots with satellite ID at its last destination. Each satellite includes a system symbol and its identifier. `G' stands for GPS, `E' stands for GALILEO, `B' stands for BeiDou. Fig. \ref{fig:mt1_obt} and Fig. \ref{fig:mt2_obt} show more clear satellite orbits without the satellite ID. The green orbit or satellite indicates satellite was used in navigation. The cyan color indicates satellite signal available but not used (In this implementation, they were not used because satellite elevation is lower than elevation cutoff angle). The blue color indicates satellite signal available but not available for use in navigation. The red color indicates satellites signal is not available. Several reasons will cause color blue and red, such as unhealthy status reported by satellite, lack of ephemeris, low signal strength, below elevation cutoff angle setup, and so on \cite{ucenter}. 
 	
 	Some orbits in both Fig. \ref{fig:mt1} and Fig. \ref{fig:mt2} have different colors shift between available status and unavailable status, such as B21, E5, and G24 in Fig. \ref{fig:mt1}. When the satellites are at low elevation and the vehicle is moving, the receiver may lose tracking of the satellites blocked by high buildings or trees. 
@@ -51,7 +54,7 @@
 			\caption{	Without satellite ID.}
 			\label{fig:mt1_obt}
 		\end{subfigure}
-		\caption[short]{Sky plot and satellite orbit for moving test using single band antenna.}
+		\caption[short]{Sky plot and satellite orbit during the moving test that used the single band antenna.}
 		\label{fig:mt1}
 	\end{figure}
 
@@ -69,12 +72,22 @@
 				Without satellite ID.}
 			\label{fig:mt2_obt}
 		\end{subfigure}
-		\caption[short]{Sky plot and satellite orbit for moving test using dual band antenna.}
+		\caption[short]{Sky plot and satellite orbit during moving test that used the dual band antenna.}
 		\label{fig:mt2}
 	\end{figure}
 	
-	Fig. \ref{fig:m1vspeed}a and Fig. \ref{fig:m2vspeed}a show the horizontal error for the moving test, the analysis can be found in the paper \cite{hu2021using}. Fig. \ref{fig:m1vspeed}b and Fig. \ref{fig:m2vspeed}b show the vehicle speed over ground. Fig. \ref{fig:m1vspeed}c and Fig. \ref{fig:m2vspeed}c show the number of satellites used in navigation. The colors are marked based on the operation used in the experiment, the definition of these acronyms can be founded in Table IV from the paper \cite{hu2021using}. The purple line means the SF GNSS OS, F9P SBAS, SF GNSS VN have the same number of satellites used. These numbers do not count for the SBAS satellites.
-	Most cases have the same number but have exceptions which are colored as blue, red, and green. The reason that the number of satellites used suddenly dropped is due to satellite signal loss. The attached video shows an example of the satellite information interface from the u-center from the rerun of moving test for dual-band antenna in F9P SBAS. The column 'Qi' is the signal quality indicator. The description of `Qi' is followed by Table 1. The satellite will be used in pseudorange positioning only when $Qi \geq 4$ which means code locked and time synchronized. In RTK for using carrier data, it requires $Qi = 7$. The `PR used' indicate that if the satellite code measurement is used, Y for yes and N for no. When the satellite signal fades or is blocked by obstructions, such as buildings and trees, the receiver will lose tracking of the signal and the signal quality indicator will be changed to code unlocked statuses ($Qi = 0,1,2,3$). As shown in the video, the Qi of satellite E3 was dropped from 7 to 0 when signal lost, and then back to 7 when the receiver re-lock the satellite. `Qi' change from 7 to other values refers to cycle slip. Cycle slip can be caused by deep rapid signal fading \cite{sennott1992use}. When the receiver detects the cycle slip for a satellite, it will not use this satellite for RTK positioning.
+	Fig. \ref{fig:m1vspeed}a and Fig. \ref{fig:m2vspeed}a show the horizontal error relative to the RTK ground truth trajectory (see Sec. VI.D in [1]) during the moving test. Additionally, the analysis can be found in \cite{hu2021using}. Fig. \ref{fig:m1vspeed}b and Fig. \ref{fig:m2vspeed}b show the vehicle speed over ground. The vehicle speed plots are based on the results from RTK. 
+	Fig. \ref{fig:m1vspeed}c and Fig. \ref{fig:m2vspeed}c show the number of satellites used in navigation. 
+	The plots for the number of satellites used are shown by all receivers since different setup results in different satellite usage scenarios. 
+	The definition of these acronyms can be founded in Table IV from the paper \cite{hu2021using}. The purple line in Fig. \ref{fig:m1vspeed}c means the SF GNSS OS, F9P SBAS, SF GNSS VN have the same number of satellites used. These numbers do not count for the SBAS satellites since they provides corrections but not used for positioning.
+	
+	In Fig. \ref{fig:m1vspeed}c, at most time instances, all experiments have the same number of satellite in most cases but have exceptions which are colored as blue, red, and green for SF GNSS OS, F9P SBAS, and SF GNSS VN, respectively. The reason that the number of satellites used suddenly dropped is due to satellite signal loss. The attached video shows an example of the satellite information interface from the u-center from the rerun of moving test for dual-band antenna in F9P SBAS. The following features is needed for the discussion. 
+	\begin{itemize}
+		\item The column 'Qi' is the signal quality indicator. The description of `Qi' is followed by Table 1. The satellite will be used in pseudorange positioning only when $Qi \geq 4$ which means code locked and time synchronized. In RTK for using carrier data, it requires $Qi = 7$.
+		\item The `PR used' indicate that if the satellite code measurement is used, Y for yes and N for no.
+	\end{itemize}
+	
+	When the satellite signal fades or is blocked by obstructions, such as buildings and trees, the receiver will lose tracking of the signal and the signal quality indicator will be changed to code unlocked statuses ($Qi = 0,1,2,3$). \red Fig. (not yet plotted) \black and the attached video show the Qi of satellite E3 was dropped from 7 to 0 when signal lost, and then back to 7 when the receiver re-lock the satellite. `Qi' change from 7 to other values refers to cycle slip. Cycle slip can be caused by deep rapid signal fading \cite{sennott1992use}. When the receiver detects the cycle slip for a satellite, it will not use this satellite for RTK positioning.
 	
 	The number of satellites used in RTK is less than others is because the u-blox M8P does not support the GALILEO system.
 	
