@@ -8,57 +8,83 @@
 	}
 	\maketitle
 	
-
+	
 	This support document provides additional information related those experiments that could not fit within the page constraints of VN-DGNSS paper \cite{hu2021using}.
 	
 	\section{Stationary test}
 	For the stationary test, all the receivers were connected to a high quality antenna mounted on the roof of Winston Chung Hall at the University of California, Riverside. That antenna location was determined by Online Positioning User Service (OPUS). This antenna is located on the roof of Winston Chung Hall at the University of California, Riverside. The antenna has a clear view of the open sky. The elevation angle cutoff for all receivers was set by 15$^\circ$. For a long duration test, to analyze position estimation accuracy, UTC time, geodetic and geocentric coordinates were saved using u-center software. The underlying u-blox raw data (e.g., measurements, satellite status) were not saved.
-
+	
 	
 	\section{Moving test}
-	For the moving tests, the raw data was stored as `.ubx' files using u-center software. The data file are available in the `test\_data' folder at the open-source repository \footnote{VN-DGNSS repository: \url{https://github.com/Azurehappen/Virtual-Network-DGNSS-Project}.}. The files are named according to the acronyms defined in Table IV of the paper \cite{hu2021using}. The files that are named as `RTK' are those for which the receiver was operating ground truth trajectory. The elevation angle cutoff for all receivers was set by 15$^\circ$. During the experiment, the u-blox RTK status always maintained integer fixed solution.
+	For the moving tests, the raw data was stored as `.ubx' files using u-center software. The data file are available in the `test\_data' folder at the open-source repository (VN-DGNSS repository: \url{https://github.com/Azurehappen/Virtual-Network-DGNSS-Project}.). The files are named according to the acronyms defined in Table IV of the paper \cite{hu2021using}. The files that are named as `RTK' are those for which the receiver was operating ground truth trajectory. The elevation angle cutoff for all receivers was set by 15$^\circ$. During the experiment, the u-blox RTK status always maintained integer fixed solution.
+	
+	\subsection{Vehicle Trajectories}	
+	
 	Fig. \ref{fig:trj_mt1} and Fig. \ref{fig:trj_mt2} show the vehicle trajectory for the moving test using single-band and dual-band antenna, respectively.
+	Since the receivers were all connected to the same antenna, the effects on the experiment of the surroundings are the same for all receivers. 
 	\begin{figure}[H]
 		\centering
-		\begin{subfigure}{.5\textwidth}
+		\hfill
+		\begin{subfigure}{.45\textwidth}
 			\includegraphics[width=\linewidth]{figures/trajectory_single.eps}
 			\caption{Vehicle trajectory for moving test using single band antenna.}
 			\label{fig:trj_mt1}
 		\end{subfigure}%
-		\begin{subfigure}{.5\textwidth}
+		\hfill
+		\begin{subfigure}{.45\textwidth}
 			\includegraphics[width=\linewidth]{figures/trajectory_dual.eps}
 			\caption{Vehicle trajectory for moving test using dual band antenna.}
 			\label{fig:trj_mt2}
 		\end{subfigure}
+		\hfill
 		\caption[short]{Vehicle trajectory for moving test.}
 		\label{fig:trj}
-	\end{figure}
+	\end{figure}%
 	
-	Since the receivers were all connected to the same antenna, the effects of the experiment at surroundings are the same for all receivers. 
-	%By rerunning the `.ubx' file using u-center, the results for moving tests will be discussed. 
-	The sky plots in Fig. \ref{fig:mt1} and \ref{fig:mt2} show the satellites were tracked from the F9P SBAS experiment. \red The receivers using the VN-DGNSS approach do not use SBAS satellites. The receivers using RTK do not have SBAS and GALILEO satellites since u-blox M8P does not support them. \footnote{\red Not sure how to revise that, these are not new discussion. Basically, Fig 2 and 3 from F9P SBAS can show all the sky scenarios for the test duration. But VN-DGNSS and RTK can not because some system are disabled. There is not need to display all the result for them, because the experiment at surroundings are the same for all receivers.}
+	
+	
+	
+	
+	\subsection{Satellite Sky Plots}
+	The sky plots in Fig. \ref{fig:mt1} and \ref{fig:mt2} show the satellites that were tracked during the F9P SBAS experiment. 
+	Fig. \ref{fig:mt1_sky} and Fig. \ref{fig:mt2_sky} show the sky plots with satellite ID marking its final location. 
+	Each satellite includes a system  identifier: 
+	`G' stands for GPS, 
+	`E' stands for Galileo, 
+	`B' stands for BeiDou. \blue 
+	The number following the system identifier is the satellite PRN. \black
+	\red 
+	The receivers using the VN-DGNSS approach do not use SBAS satellites. 
+	The receiver performing RTK did not have SBAS and Galileo satellites because u-blox M8P does not support them. 
 	\black
 	
-	Fig. \ref{fig:mt1_sky} and Fig. \ref{fig:mt2_sky} show the sky plots with satellite ID at its last destination. Each satellite includes a system symbol and its identifier. `G' stands for GPS, `E' stands for GALILEO, `B' stands for BeiDou. Fig. \ref{fig:mt1_obt} and Fig. \ref{fig:mt2_obt} show more clear satellite orbits without the satellite ID. The green orbit or satellite indicates satellite was used in navigation. The cyan color indicates satellite signal available but not used (In this implementation, they were not used because satellite elevation is lower than elevation cutoff angle). The blue color indicates satellite signal available but not available for use in navigation. The red color indicates satellites signal is not available. Several reasons will cause color blue and red, such as unhealthy status reported by satellite, lack of ephemeris, low signal strength, below elevation cutoff angle setup, and so on \cite{ucenter}. 
-	
-	Some orbits in both Fig. \ref{fig:mt1} and Fig. \ref{fig:mt2} have different colors shift between available status and unavailable status, such as B21, E5, and G24 in Fig. \ref{fig:mt1}. When the satellites are at low elevation and the vehicle is moving, the receiver may lose tracking of the satellites blocked by high buildings or trees. 
-	\begin{figure}[H]
+	Fig. \ref{fig:mt1_obt} and Fig. \ref{fig:mt2_obt} more clearly show each satellite orbit, without the satellite ID. 
+	Green indicates those satellite  used in navigation. 
+	Cyan indicates satellites whose signal was available but not used because their elevation is \red lower than the elevation that user set. \black
+	Purple indicates satellites whose signal was available but not use in navigation for other reasons. 
+	Red  indicates satellites whose signal is not available. 
+	Several reasons will cause purple or red \cite{ucenter}, e.g.: unhealthy status reported by satellite, lack of ephemeris, low signal strength, below the elevation cutoff angle. 
+	%
+	The orbits for some satellites, such as B21, E5, and G24, change colors in Figs. \ref{fig:mt1} and Fig. \ref{fig:mt2}.
+	This means that their available or unavailable status changed during the time interval of the experiment.
+	For example, when a satellite is at a low elevation and rising, it may switch from unavailable to available. 
+	\begin{figure}[b]
 		\centering
 		\begin{subfigure}{.45\textwidth}
 			\includegraphics[width=\linewidth]{../Moving_SingleBand/skyplot.png}
 			\caption{With satellite ID.}
 			\label{fig:mt1_sky}
 		\end{subfigure}%
+		\hfill
 		\begin{subfigure}{.45\textwidth}
 			\includegraphics[width=\linewidth]{../Moving_SingleBand/skyplot_orbit.png}
 			\caption{	Without satellite ID.}
 			\label{fig:mt1_obt}
 		\end{subfigure}
 		\caption[short]{Sky plot and satellite orbit during the moving test that used the single band antenna.}
-		\label{fig:mt1}
+		\label{fig:mt1} 
 	\end{figure}
-
-	\begin{figure}[H]
+	\begin{figure}[tb]
 		\centering
 		\begin{subfigure}{.5\textwidth}
 			\includegraphics[width=0.9\linewidth]{../Moving_DualBand/skyplot.png}
@@ -66,6 +92,7 @@
 				With satellite ID.}
 			\label{fig:mt2_sky}
 		\end{subfigure}%
+		\hfill
 		\begin{subfigure}{.5\textwidth}
 			\includegraphics[width=0.9\linewidth]{../Moving_DualBand/skyplot_orbit.png}
 			\caption{	
@@ -76,22 +103,33 @@
 		\label{fig:mt2}
 	\end{figure}
 	
-	Fig. \ref{fig:m1vspeed}a and Fig. \ref{fig:m2vspeed}a show the horizontal error relative to the RTK ground truth trajectory (see Sec. VI.D in [1]) during the moving test. Additionally, the analysis can be found in \cite{hu2021using}. Fig. \ref{fig:m1vspeed}b and Fig. \ref{fig:m2vspeed}b show the vehicle speed over ground. The vehicle speed plots are based on the results from RTK. 
-	Fig. \ref{fig:m1vspeed}c and Fig. \ref{fig:m2vspeed}c show the number of satellites used in navigation. 
-	The plots for the number of satellites used are shown by all receivers since different setup results in different satellite usage scenarios. 
-	The definition of these acronyms can be founded in Table IV from the paper \cite{hu2021using}. The purple line in Fig. \ref{fig:m1vspeed}c means the SF GNSS OS, F9P SBAS, SF GNSS VN have the same number of satellites used. These numbers do not count for the SBAS satellites since they provides corrections but not used for positioning.
+	\subsection{Vehicle Speed, Number of Satellites, and Signal Quality during the Moving Tests}
+	Fig. \ref{fig:m1vspeed}a and Fig. \ref{fig:m2vspeed}a show the horizontal position error relative to the RTK ground truth trajectory as discussed in  Section VI.D of \cite{hu2021using}. 
+	Fig. \ref{fig:m1vspeed}b and Fig. \ref{fig:m2vspeed}b show the vehicle speed over ground as computed using the RTK data. 
 	
-	In Fig. \ref{fig:m1vspeed}c, at most time instances, all experiments have the same number of satellite in most cases but have exceptions which are colored as blue, red, and green for SF GNSS OS, F9P SBAS, and SF GNSS VN, respectively. The reason that the number of satellites used suddenly dropped is due to satellite signal loss. The attached video shows an example of the satellite information interface from the u-center from the rerun of moving test for dual-band antenna in F9P SBAS. The following features is needed for the discussion. 
+	Fig. \ref{fig:m1vspeed}c and Fig. \ref{fig:m2vspeed}c show the number of satellites used in the navigation solution for each of the experimental configurations listed  by acronym in Table IV of \cite{hu2021using}. 
+	%
+	The number of satellites per experimental configuration are similar, and always more than sufficient to yield a good GDOP, but have minor variations. 
+	The purple line in Fig. \ref{fig:m1vspeed}c shows that the SF GNSS OS, F9P SBAS, SF GNSS VN configurations all use the same number of satellites. 
+	These numbers do not count for the SBAS satellites since they provides corrections, but are not used for positioning.
+	The number of satellites used in RTK is less than others is because the u-blox M8P does not support the Galileo system.
+	
+	The reason that the number of satellites change is satellite signal loss. 
+	The attached video shows an example of the satellite information interface from the u-center during rerun of the moving test data from the F9P SBAS experiment. 
+	The following definitions are required to support the discussion:
 	\begin{itemize}
-		\item The column 'Qi' is the signal quality indicator. The description of `Qi' is followed by Table 1. The satellite will be used in pseudorange positioning only when $Qi \geq 4$ which means code locked and time synchronized. In RTK for using carrier data, it requires $Qi = 7$.
+		\item The column `Qi' is the signal quality indicator. 
+		The values of `Qi' are defined in Table \ref{tab:qi}. 
+		Each satellite will only be used for pseudorange positioning  when $Qi \geq 4$. 
+		Use of carrier data for RTK, requires $Qi = 7$.
 		\item The `PR used' indicate that if the satellite code measurement is used, Y for yes and N for no.
 	\end{itemize}
+	When a satellite's signal fades, is blocked by obstructions, or a cycle slip is detected \cite{sennott1992use},  the receiver may change the signal quality indicator  to code unlocked statuses ($Qi = 0,1,2,3$). 
+	Fig. \ref{fig:qi} and the attached video show the Qi of satellite E3 was dropped from 7 to 0 when the signal was lost.
+	Then, the Qi changes back to 7 when the receiver re-locks the satellite. 
+	In Fig. \ref{fig:qi}b, satellite E3 is not used when $Qi \geq 4$, which explains the change in the total number of satellites used as shown in Fig. \ref{fig:qi}a.
 	
-	When the satellite signal fades or is blocked by obstructions, such as buildings and trees, the receiver will lose tracking of the signal and the signal quality indicator will be changed to code unlocked statuses ($Qi = 0,1,2,3$). Fig. \ref{fig:qi} and the attached video show the Qi of satellite E3 was dropped from 7 to 0 when signal lost, and then back to 7 when the receiver re-lock the satellite. In Fig. \ref{fig:qi}b, the E3 is not used when $Qi \geq 4$. This changes reflect to the total number of satellite used shown in Fig. \ref{fig:qi}a.
 	
-	`Qi' change from 7 to other values refers to cycle slip. Cycle slip can be caused by deep rapid signal fading \cite{sennott1992use}. When the receiver detects the cycle slip for a satellite, it will not use this satellite for RTK positioning.
-	
-	The number of satellites used in RTK is less than others is because the u-blox M8P does not support the GALILEO system.
 	
 	\begin{table}[H]
 		\centering
@@ -107,9 +145,21 @@
 			6     & code and carrier locked and time synchronized & carrier lock is intermittent       \\ \hline
 			7     & code and carrier locked and time synchronized & carrier lock achieved              \\ \hline
 		\end{tabular}
-		\label{tab:qi}
 		\caption{Definition of signal quality indicator}
+		\label{tab:qi}
 	\end{table}
+	\clearpage
+	
+	\todo{WH:
+		Please address the following:
+		\begin{enumerate}
+			\item See the marked up pdf.  Implement all changes.
+			\item In tex documents, never hardcode a table or biblio entry. Use labels.  I had to fix two in this document.
+			\item There are two moving experiments. Clearly state which experiment corresponds with Fig. \ref{fig:qi}	.
+			\item The horizontal axis of Fig. \ref{fig:qi} needs to match the units of Figs \ref{fig:m1vspeed} and \ref{fig:m2vspeed}. One is in epochs while the other is in minutes. When I look at Fig. \ref{fig:qi}, I should be able to see the same number of satellites use in one of Figs \ref{fig:m1vspeed} and \ref{fig:m2vspeed}.
+		\end{enumerate}
+		I have made changes throughout. Please proofread carefully
+	}
 	
 	\begin{figure}[H]
 		\centering
@@ -117,22 +167,22 @@
 		\caption{Vehicle speed and number of satellites used for moving test using single band antenna.}
 		\label{fig:m1vspeed}
 	\end{figure}
-
+	
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.9\textwidth]{figures/dynamicinfo_dual.eps}
 		\caption{Vehicle speed and number of satellites used for moving test using dual band antenna.}
 		\label{fig:m2vspeed}
 	\end{figure}
-
+	
 	\begin{figure}[H]		
 		\centering		
 		\includegraphics[width=0.9\textwidth]{figures/Qi.eps}		
 		\caption{An example of signal quality indicator corresponding to satellite usage status.}		
 		\label{fig:qi}	
 	\end{figure}
-
-    \bibliographystyle{ieeetr}
-    \bibliography{References.bib}
-
+	
+	\bibliographystyle{ieeetr}
+	\bibliography{References.bib}
+	
 \end{document}
