@@ -12,32 +12,34 @@
 	This support document provides additional information related those experiments that could not fit within the page constraints of VN-DGNSS paper \cite{hu2021using}.
 	
 	\section{Stationary test}
-	For the stationary test, all the receivers were connected to a high quality antenna mounted on the roof of Winston Chung Hall at the University of California, Riverside. That antenna location was determined by Online Positioning User Service (OPUS). This antenna is located on the roof of Winston Chung Hall at the University of California, Riverside. The antenna has a clear view of the open sky. The elevation angle cutoff for all receivers was set by 15$^\circ$. For a long duration test, to analyze position estimation accuracy, UTC time, geodetic and geocentric coordinates were saved using u-center software. The underlying u-blox raw data (e.g., measurements, satellite status) were not saved.
+	
+	For the stationary test, all the receivers were connected to a high quality antenna mounted on the roof of Winston Chung Hall at the University of California, Riverside. That antenna location was determined by Online Positioning User Service (OPUS). This antenna is located on the roof of Winston Chung Hall at the University of California, Riverside. The antenna has a clear view of the open sky. The elevation angle cutoff for all receivers was set to 15$^\circ$. For a long duration test, to analyze position estimation accuracy, UTC time, geodetic and geocentric coordinates were saved using u-center software. The underlying u-blox raw data (e.g., measurements, satellite status) were not saved.
 	
 	
 	\section{Moving test}
-	For the moving tests, the raw data was stored as `.ubx' files using u-center software. The data file are available in the `test\_data' folder at the open-source repository (VN-DGNSS repository: \url{https://github.com/Azurehappen/Virtual-Network-DGNSS-Project}.). The files are named according to the acronyms defined in Table IV of the paper \cite{hu2021using}. The files that are named as `RTK' are those for which the receiver was operating ground truth trajectory. The elevation angle cutoff for all receivers was set by 15$^\circ$. During the experiment, the u-blox RTK status always maintained integer fixed solution.
+	
+	For the moving tests, the raw data was stored as `.ubx' files using u-center software. The data files are available in the `test\_data' folder at the open-source repository\footnote{VN-DGNSS repository: \url{https://github.com/Azurehappen/Virtual-Network-DGNSS-Project}.}. The files are named according to the acronyms defined in Table IV of the paper \cite{hu2021using}. The files that are named as `RTK' are those for which the receiver was operating ground truth trajectory. The elevation angle cutoff for all 4 receivers was set to 15$^\circ$. During the experiment, the u-blox RTK status always maintained integer fixed solution indicating that it had centimeter accuracy.
 	
 	\subsection{Vehicle Trajectories}	
 	
 	Fig. \ref{fig:trj_mt1} and Fig. \ref{fig:trj_mt2} show the vehicle trajectory for the moving test using single-band and dual-band antenna, respectively.
-	Since the receivers were all connected to the same antenna, the effects on the experiment of the surroundings are the same for all receivers. 
+	Since the receivers were all connected to the same antenna, the effects on the experiment of the surroundings (e.g., mountains, buildings, foliage) are the same for all receivers. 
 	\begin{figure}[H]
 		\centering
 		\hfill
 		\begin{subfigure}{.45\textwidth}
 			\includegraphics[width=\linewidth]{figures/trajectory_single.eps}
-			\caption{Vehicle trajectory for moving test using single band antenna.}
+			\caption{Vehicle trajectory during the moving test using the single band antenna.}
 			\label{fig:trj_mt1}
 		\end{subfigure}%
 		\hfill
 		\begin{subfigure}{.45\textwidth}
 			\includegraphics[width=\linewidth]{figures/trajectory_dual.eps}
-			\caption{Vehicle trajectory for moving test using dual band antenna.}
+			\caption{Vehicle trajectory during the moving test using the dual band antenna.}
 			\label{fig:trj_mt2}
 		\end{subfigure}
 		\hfill
-		\caption[short]{Vehicle trajectory for moving test.}
+		\caption[short]{Vehicle trajectories during the moving test.}
 		\label{fig:trj}
 	\end{figure}%
 	
@@ -46,6 +48,7 @@
 	
 	
 	\subsection{Satellite Sky Plots}
+	
 	The sky plots in Fig. \ref{fig:mt1} and \ref{fig:mt2} show the satellites that were tracked during the F9P SBAS experiment. 
 	Fig. \ref{fig:mt1_sky} and Fig. \ref{fig:mt2_sky} show the sky plots with satellite ID marking its final location. 
 	Each satellite includes a system  identifier: 
@@ -55,17 +58,17 @@
 	The number following the system identifier is the satellite PRN. \black
 	\red 
 	The receivers using the VN-DGNSS approach do not use SBAS satellites. 
-	The receiver performing RTK did not have SBAS and Galileo satellites because u-blox M8P does not support them. 
+	The receiver performing RTK did not use SBAS and Galileo satellites because u-blox M8P does not support them.
 	\black
 	
 	Fig. \ref{fig:mt1_obt} and Fig. \ref{fig:mt2_obt} more clearly show each satellite orbit, without the satellite ID. 
 	Green indicates those satellite  used in navigation. 
 	Cyan indicates satellites whose signal was available but not used because their elevation is \red lower than the elevation that user set. \black
-	Purple indicates satellites whose signal was available but not use in navigation for other reasons. 
+	Blue indicates satellites whose signal was available but not use in navigation for other reasons. 
 	Red  indicates satellites whose signal is not available. 
-	Several reasons will cause purple or red \cite{ucenter}, e.g.: unhealthy status reported by satellite, lack of ephemeris, low signal strength, below the elevation cutoff angle. 
+	Several reasons will cause blue or red \cite{ucenter}, e.g.: unhealthy status reported by satellite, lack of ephemeris, low signal strength, below the elevation cutoff angle. 
 	%
-	The orbits for some satellites, such as B21, E5, and G24, change colors in Figs. \ref{fig:mt1} and Fig. \ref{fig:mt2}.
+	The orbits for some satellites, such as B21, E5, and G24, change colors in Figs. \ref{fig:mt1}.
 	This means that their available or unavailable status changed during the time interval of the experiment.
 	For example, when a satellite is at a low elevation and rising, it may switch from unavailable to available. 
 	\begin{figure}[b]
@@ -104,10 +107,11 @@
 	\end{figure}
 	
 	\subsection{Vehicle Speed, Number of Satellites, and Signal Quality during the Moving Tests}
-	Fig. \ref{fig:m1vspeed}a and Fig. \ref{fig:m2vspeed}a show the horizontal position error relative to the RTK ground truth trajectory as discussed in  Section VI.D of \cite{hu2021using}. 
-	Fig. \ref{fig:m1vspeed}b and Fig. \ref{fig:m2vspeed}b show the vehicle speed over ground as computed using the RTK data. 
 	
-	Fig. \ref{fig:m1vspeed}c and Fig. \ref{fig:m2vspeed}c show the number of satellites used in the navigation solution for each of the experimental configurations listed  by acronym in Table IV of \cite{hu2021using}. 
+	Fig. \ref{fig:m1vspeed}a and Fig. \ref{fig:m2vspeed}a show the horizontal position error relative to the RTK ground truth trajectory as discussed in Section VI.D of \cite{hu2021using}. 
+	Fig. \ref{fig:m1vspeed}b and Fig. \ref{fig:m2vspeed}b show the vehicle speed over ground as \red reported by the receiver using RTK. \black
+	
+	Fig. \ref{fig:m1vspeed}c and Fig. \ref{fig:m2vspeed}c show the number of satellites used in the navigation solution for each of the experimental configurations listed  by acronyms in Table IV of \cite{hu2021using}. 
 	%
 	The number of satellites per experimental configuration are similar, and always more than sufficient to yield a good GDOP, but have minor variations. 
 	The purple line in Fig. \ref{fig:m1vspeed}c shows that the SF GNSS OS, F9P SBAS, SF GNSS VN configurations all use the same number of satellites. 
@@ -178,7 +182,7 @@
 	\begin{figure}[H]		
 		\centering		
 		\includegraphics[width=0.9\textwidth]{figures/Qi.eps}		
-		\caption{An example of signal quality indicator corresponding to satellite usage status.}		
+		\caption{An example of signal quality indicator corresponding to satellite usage status from F9P SBAS in moving test using dual band antenna.}		
 		\label{fig:qi}	
 	\end{figure}
 	
