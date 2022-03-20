@@ -14,9 +14,5 @@
 *.asv
 *.synctex.gz
 *.ubx
-/test_data/Experiment_Support_Doc/figures/dynamicinfo_dual-eps-converted-to.pdf
-/test_data/Experiment_Support_Doc/figures/dynamicinfo_single-eps-converted-to.pdf
-/test_data/Experiment_Support_Doc/figures/trajectory_dual-eps-converted-to.pdf
-/test_data/Experiment_Support_Doc/figures/trajectory_single-eps-converted-to.pdf
-/test_data/Experiment_Support_Doc/figures/Qi-eps-converted-to.pdf
+*-eps-converted-to.pdf
 /test_data/Experiment_Support_Doc/support_doc.pdf
