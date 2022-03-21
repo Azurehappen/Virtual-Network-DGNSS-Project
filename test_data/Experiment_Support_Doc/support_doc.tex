@@ -154,17 +154,6 @@
 	\end{table}
 	\clearpage
 	
-	\todo{WH:
-		Please address the following:
-		\begin{enumerate}
-			\item See the marked up pdf.  Implement all changes.
-			\item In tex documents, never hardcode a table or biblio entry. Use labels.  I had to fix two in this document.
-			\item There are two moving experiments. Clearly state which experiment corresponds with Fig. \ref{fig:qi}	.
-			\item The horizontal axis of Fig. \ref{fig:qi} needs to match the units of Figs \ref{fig:m1vspeed} and \ref{fig:m2vspeed}. One is in epochs while the other is in minutes. When I look at Fig. \ref{fig:qi}, I should be able to see the same number of satellites use in one of Figs \ref{fig:m1vspeed} and \ref{fig:m2vspeed}.
-		\end{enumerate}
-		I have made changes throughout. Please proofread carefully
-	}
-	
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.9\textwidth]{figures/dynamicinfo_single.eps}
@@ -186,6 +175,56 @@
 		\label{fig:qi}	
 	\end{figure}
 	
+	
+	\section{Lane Matching Application}
+	This section provide an additional experiment for evaluating the VN-DGNSS in an lane matching application. 
+	The goal is that the software uses the receiver computed position to determine in which lane the vehicle is situated as it drives along the lane. The system level traffic or intersection controllers can use this lane inventory information to more efficiently control roadway 
+	management. Correct lane determination is a function of position estimation accuracy. This evaluation compares application performance for two receivers one with SF GPS VN using VN-DGNSS corrections and the other with SF GPS SPS.
+	
+	\subsection{Hardware Setup}
+	This moving test using two u-blox M8P single-frequency receivers. 
+	One communicated with the UCR VN-DGNSS server, while another one operated in SPS mode, without 
+	external corrections. A third u-blox ZED-F9P dual-frequency receiver operated in RTK integer fixed solution to provide a centimeter level accuracy solution that was used as the ground truth trajectories.
+	
+	\subsection{Experiment Description}
+	In this experiment, we drove a sedan on a customized road tesbted inside the UCR CE-CERT parking lot that contained two lanes each 3.6 meters wide. The length of road testbed is about 270 meters. The vehicle was driven along both lanes three times in each direction yielding a total of 12 lane traverses, as show in Fig. \ref{fig:LDsk}.
+	The antenna (red circle) was mounted on the roof of the sedan (blue box) at three different locations for the purpose of simulating driving at different lateral positions relative to the lane center line. The green arrows indicate 6 straight driving tests from West to East direction and East to West direction, respectively. 
+	\begin{figure}[H]		
+		\centering		
+		\includegraphics[width=0.9\textwidth]{figures/LDsketch.png}	
+		\caption{Sketch of the lane determination driving test.}		
+		\label{fig:LDsk}	
+	\end{figure}
+	
+	\subsection{Experimental Results}
+	Fig. \ref{fig:e2w} and Fig. \ref{fig:w2e} show the trajectories of the 12 lane traverses. The red curves show the ground truth trajectory. The green curves show the trajectory computed 
+	by the M8P receiver using SF GPS VN. The blue curves show the trajectory computed by the M8P receiver using SF GPS SPS. 
+	Fig. \ref{fig:e2w} shows trajectories driving from East to West. Fig. \ref{fig:w2e} shows trajectories driving West to East. The red trajectory shows the correct lane determination, with the first three traverses in the bottom lane (southern) and the last three traverses in the top lane (northern).
+	
+	Fig. \ref{fig:e2w} and Fig. \ref{fig:w2e} allow the reader to visually see whether the SF GPS VN and SF GPS SPS computed positions are in the correct lane. It is clear that the SF GPS VN trajectories are closer to the ground truth RTK solution than are the SF GPS SPS
+	trajectories. The SF GPS VN trajectories are also more frequently in the correct lane. Only in the last graph in Fig. \ref{fig:w2e} does the green curves surpass the edge of upper lane.
+	\begin{figure}[H]		
+		\centering		
+		\includegraphics[width=0.9\textwidth]{figures/e2w.eps}		
+		\caption{Trajectory of East to West direction driving test.}		
+		\label{fig:e2w}	
+	\end{figure}
+
+	\begin{figure}[H]		
+		\centering		
+		\includegraphics[width=0.9\textwidth]{figures/w2e.eps}	
+		\caption{Trajectory of West to East direction driving test.}		
+		\label{fig:w2e}	
+	\end{figure}
+	
+	Fig. \ref{fig:probLD} shows the probability of making the correct lane decision using the SF GPS SPS and SF GPS VN positions as a function of the distance of the ground-truth trajectory from the lane center. When the vehicle is near the lane center (i.e., less than 0.5 m), both SF GPS SPS and SF GPS VN correctly determine the lane. As the distance from the lane center line increases, the distance to the lane boundary decreases, so that position error begins to affect the lane determination decision. The decrease in probability of making the correct decision drops off earlier and faster for the SF GPS SPS solution, dropping below 95\% at about 0.7 m, which is 1.1 m from the lane edge. The solution using the UCR VN-DGNSS server maintains correct decision through 1.3 m from the lance center, which is 0.5 m from the lane edge.
+	\begin{figure}[H]		
+		\centering		
+		\includegraphics[width=0.9\textwidth]{figures/probLD.eps}	
+		\caption{Probability of making the correct lane decision.}		
+		\label{fig:probLD}	
+	\end{figure}
+
 	\bibliographystyle{ieeetr}
 	\bibliography{References.bib}
 	
