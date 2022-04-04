@@ -10,5 +10,9 @@
 *.bbl
 *.blg
 *.log
+*.acr
+*.asv
 *.synctex.gz
 *.ubx
+*-eps-converted-to.pdf
+test_data/Experiment_Support_Doc/support_doc.tex

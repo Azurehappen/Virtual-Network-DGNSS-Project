@@ -372,7 +372,7 @@ plot(t_x,SVs_same,'.','Color','#7E2F8E');
 hold on
 plot(t_x,SVs_RTK,'.','Color','#000000');
 grid on
-legend('SF GNSS OS','F9P SBAS','SF GNSS VN','Same #SVs','RTK')
+legend('SF GNSS VN','SF GNSS OS','F9P SBAS','Same #SVs','RTK')
 legend('location','best');
 xlabel('Epoch')
 axis tight
