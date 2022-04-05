@@ -58,12 +58,12 @@
 	The number following the system identifier is the satellite PRN. \black
 	\red 
 	The receivers using the VN-DGNSS approach do not use SBAS satellites. 
-	The receiver performing RTK did not use SBAS and Galileo satellites because u-blox M8P does not support them.
+	The receiver performing RTK did not use SBAS and Galileo satellites because the u-blox M8P does not support them.
 	\black
 	
 	Fig. \ref{fig:mt1_obt} and Fig. \ref{fig:mt2_obt} more clearly show each satellite orbit, without the satellite ID. 
 	Green indicates those satellite  used in navigation. 
-	Cyan indicates satellites whose signal was available but not used because their elevation is \red lower than the elevation that user set. \black
+	Cyan indicates satellites whose signal was available but not used because their elevation is \red lower than the elevation cutoff set by the user. \black
 	Blue indicates satellites whose signal was available but not use in navigation for other reasons. 
 	Red  indicates satellites whose signal is not available. 
 	Several reasons will cause blue or red \cite{ucenter}, e.g.: unhealthy status reported by satellite, lack of ephemeris, low signal strength, below the elevation cutoff angle. 
@@ -109,7 +109,7 @@
 	\subsection{Vehicle Speed, Number of Satellites, and Signal Quality during the Moving Tests}
 	
 	Fig. \ref{fig:m1vspeed}a and Fig. \ref{fig:m2vspeed}a show the horizontal position error relative to the RTK ground truth trajectory as discussed in Section VI.D of \cite{hu2021using}. 
-	Fig. \ref{fig:m1vspeed}b and Fig. \ref{fig:m2vspeed}b show the vehicle speed over ground as \red reported by the receiver using RTK. \black
+	Fig. \ref{fig:m1vspeed}b and Fig. \ref{fig:m2vspeed}b show the vehicle speed over ground as reported by the receiver using RTK. \black
 	
 	Fig. \ref{fig:m1vspeed}c and Fig. \ref{fig:m2vspeed}c show the number of satellites used in the navigation solution for each of the experimental configurations listed  by acronyms in Table IV of \cite{hu2021using}. 
 	%
@@ -177,17 +177,15 @@
 	
 	
 	\section{Lane Matching Application}
-	This section provide an additional experiment for evaluating the VN-DGNSS in an lane matching application. 
-	The goal is that the software uses the receiver computed position to determine in which lane the vehicle is situated as it drives along the lane. The system level traffic or intersection controllers can use this lane inventory information to more efficiently control roadway 
-	management. Correct lane determination is a function of position estimation accuracy. This evaluation compares application performance for two receivers one with SF GPS VN using VN-DGNSS corrections and the other with SF GPS SPS.
+	This section provides an additional experiment that evaluate the VN-DGNSS in a lane matching application. 
+	The goal is that the software uses the receiver computed position to determine the lane in which vehicle is situated as it drives. The system traffic or intersection controllers could use this lane inventory information to more efficiently manage the roadway. Correct lane determination is a function of position estimation accuracy.
 	
 	\subsection{Hardware Setup}
-	This moving test using two u-blox M8P single-frequency receivers. 
-	One communicated with the UCR VN-DGNSS server, while another one operated in SPS mode, without 
-	external corrections. A third u-blox ZED-F9P dual-frequency receiver operated in RTK integer fixed solution to provide a centimeter level accuracy solution that was used as the ground truth trajectories.
+	This moving test used two u-blox M8P single-frequency receivers. 
+	One communicated with the UCR VN-DGNSS server. The other operated in SPS mode, without external corrections. A third u-blox ZED-F9P dual-frequency receiver operated in RTK integer-fixed mode to provide a centimeter-level accuracy mode that was used as the ground truth trajectories.
 	
 	\subsection{Experiment Description}
-	In this experiment, we drove a sedan on a customized road tesbted inside the UCR CE-CERT parking lot that contained two lanes each 3.6 meters wide. The length of road testbed is about 270 meters. The vehicle was driven along both lanes three times in each direction yielding a total of 12 lane traverses, as show in Fig. \ref{fig:LDsk}.
+	In this experiment, we drove a sedan on a customized road tesbted inside the UCR CE-CERT parking lot that contained two lanes each 3.6 meters wide. The length of the road testbed is about 270 meters. The vehicle was driven along both lanes three times in each direction yielding a total of 12 lane traverses, as show in Fig. \ref{fig:LDsk}.
 	The antenna (red circle) was mounted on the roof of the sedan (blue box) at three different locations for the purpose of simulating driving at different lateral positions relative to the lane center line. The green arrows indicate 6 straight driving tests from West to East direction and East to West direction, respectively. 
 	\begin{figure}[H]		
 		\centering		
@@ -197,10 +195,9 @@
 	\end{figure}
 	
 	\subsection{Experimental Results}
-	Fig. \ref{fig:e2w} and Fig. \ref{fig:w2e} show the trajectories of the 12 lane traverses. The red curves show the ground truth trajectory. The green curves show the trajectory computed 
+	Fig. \ref{fig:e2w} and Fig. \ref{fig:w2e} show the trajectories of the 12 lane traverses. The red curves show the ground truth trajectory, which is considered as correct. The green curves show the trajectory computed 
 	by the M8P receiver using SF GPS VN. The blue curves show the trajectory computed by the M8P receiver using SF GPS SPS. 
-	Fig. \ref{fig:e2w} shows trajectories driving from East to West. Fig. \ref{fig:w2e} shows trajectories driving West to East. The red trajectory shows the correct lane determination, with the first three traverses in the bottom lane (southern) and the last three traverses in the top lane (northern).
-	
+	Fig. \ref{fig:e2w} shows trajectories driving from East to West. Fig. \ref{fig:w2e} shows trajectories driving West to East.
 	Fig. \ref{fig:e2w} and Fig. \ref{fig:w2e} allow the reader to visually see whether the SF GPS VN and SF GPS SPS computed positions are in the correct lane. It is clear that the SF GPS VN trajectories are closer to the ground truth RTK solution than are the SF GPS SPS
 	trajectories. The SF GPS VN trajectories are also more frequently in the correct lane. Only in the last graph in Fig. \ref{fig:w2e} does the green curves surpass the edge of upper lane.
 	\begin{figure}[H]		
@@ -217,7 +214,7 @@
 		\label{fig:w2e}	
 	\end{figure}
 	
-	Fig. \ref{fig:probLD} shows the probability of making the correct lane decision using the SF GPS SPS and SF GPS VN positions as a function of the distance of the ground-truth trajectory from the lane center. When the vehicle is near the lane center (i.e., less than 0.5 m), both SF GPS SPS and SF GPS VN correctly determine the lane. As the distance from the lane center line increases, the distance to the lane boundary decreases, so that position error begins to affect the lane determination decision. The decrease in probability of making the correct decision drops off earlier and faster for the SF GPS SPS solution, dropping below 95\% at about 0.7 m, which is 1.1 m from the lane edge. The solution using the UCR VN-DGNSS server maintains correct decision through 1.3 m from the lance center, which is 0.5 m from the lane edge.
+	Fig. \ref{fig:probLD} shows the probability of making the correct lane decision using the SF GPS SPS and SF GPS VN positions as a function of the distance of the ground-truth trajectory from the lane center. When the vehicle is near the lane center (i.e., less than 0.5 m), both SF GPS SPS and SF GPS VN correctly determine the lane. As the distance from the lane center line increases, the distance to the lane boundary decreases, so that position error begins to affect the lane determination decision. The decrease in probability of making the correct decision drops off earlier and faster for the SF GPS SPS solution, dropping below 95\% at about 0.7 m from the lane centerline, which is 1.1 m from the lane edge. The solution using the UCR VN-DGNSS server maintains 100\% correct decision through 1.3 m from the lance center, which is 0.5 m from the lane edge.
 	\begin{figure}[H]		
 		\centering		
 		\includegraphics[width=0.9\textwidth]{figures/probLD.eps}	
