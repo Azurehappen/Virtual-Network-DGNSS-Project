@@ -54,16 +54,16 @@
 	Each satellite includes a system  identifier: 
 	`G' stands for GPS, 
 	`E' stands for Galileo, 
-	`B' stands for BeiDou. \blue 
-	The number following the system identifier is the satellite PRN. \black
-	\red 
-	The receivers using the VN-DGNSS approach do not use SBAS satellites. 
-	The receiver performing RTK did not use SBAS and Galileo satellites because the u-blox M8P does not support them.
+	`B' stands for BeiDou.  
+	The number following the system identifier is the satellite PRN. 
+	 
+	The receivers using the VN-DGNSS approach do not use the SBAS satellites. 
+	The receiver performing RTK did not use the SBAS or the Galileo satellites because the u-blox M8P does not support them.
 	\black
 	
 	Fig. \ref{fig:mt1_obt} and Fig. \ref{fig:mt2_obt} more clearly show each satellite orbit, without the satellite ID. 
 	Green indicates those satellite  used in navigation. 
-	Cyan indicates satellites whose signal was available but not used because their elevation is \red lower than the elevation cutoff set by the user. \black
+	Cyan indicates satellites whose signal was available, but not used because their elevation is  lower than the elevation cutoff set by the user. 
 	Blue indicates satellites whose signal was available but not use in navigation for other reasons. 
 	Red  indicates satellites whose signal is not available. 
 	Several reasons will cause blue or red \cite{ucenter}, e.g.: unhealthy status reported by satellite, lack of ephemeris, low signal strength, below the elevation cutoff angle. 
@@ -171,21 +171,21 @@
 	\begin{figure}[H]		
 		\centering		
 		\includegraphics[width=0.9\textwidth]{figures/Qi.eps}		
-		\caption{An example of signal quality indicator corresponding to satellite usage status from F9P SBAS in moving test using dual band antenna.}		
+		\caption{An example of the u-blox signal quality indicator $Qi$ that is described in Table \ref{tab:qi} for Galileo satellite E3  during the F9P SBAS moving test using the dual band antenna. When $Qi<4$, the satellite will not be used.}		
 		\label{fig:qi}	
 	\end{figure}
 	
 	
 	\section{Lane Matching Application}
-	This section provides an additional experiment that evaluate the VN-DGNSS in a lane matching application. 
-	The goal is that the software uses the receiver computed position to determine the lane in which vehicle is situated as it drives. The system traffic or intersection controllers could use this lane inventory information to more efficiently manage the roadway. Correct lane determination is a function of position estimation accuracy.
+	This section provides an additional experiment that evaluates the VN-DGNSS in a lane matching application, wherein  the receiver computed position is used to determine the lane in which the vehicle is situated as it drives. The system traffic or intersection controllers could use this lane inventory information to more efficiently manage the roadway. Correct lane determination is a function of position estimation accuracy.
 	
 	\subsection{Hardware Setup}
 	This moving test used two u-blox M8P single-frequency receivers. 
 	One communicated with the UCR VN-DGNSS server. The other operated in SPS mode, without external corrections. A third u-blox ZED-F9P dual-frequency receiver operated in RTK integer-fixed mode to provide a centimeter-level accuracy mode that was used as the ground truth trajectories.
 	
 	\subsection{Experiment Description}
-	In this experiment, we drove a sedan on a customized road tesbted inside the UCR CE-CERT parking lot that contained two lanes each 3.6 meters wide \red and had clear view of sky. \black The length of the road testbed is about 270 meters. The vehicle was driven along both lanes three times in each direction yielding a total of 12 lane traverses, as show in Fig. \ref{fig:LDsk}.
+	In this experiment, we drove a sedan on a customized road testbed inside the UCR CE-CERT parking lot that contained two lanes each 3.6 meters wide with a clear view of the sky. 
+	 The length of the road testbed is about 270 meters. The vehicle was driven along both lanes three times in each direction yielding a total of 12 lane traverses, as show in Fig. \ref{fig:LDsk}.
 	The antenna (red circle) was mounted on the roof of the sedan (blue box) at three different locations for the purpose of simulating driving at different lateral positions relative to the lane center line. The green arrows indicate 6 straight driving tests from West to East direction and East to West direction, respectively. 
 	\begin{figure}[H]		
 		\centering		
