@@ -1,5 +1,6 @@
 ## Arguments reqiurements:
 ### 1. com port
+Check the serial port number using 'ls /dev' in ubuntu.
 ### 2. receiver option: 
 The client has predesigned configuration for ublox M8P and ZED-F9P. 
 
