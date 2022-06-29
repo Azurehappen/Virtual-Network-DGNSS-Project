@@ -10,7 +10,7 @@ Copyright (c) 2020 UC Regents
 ## I. Paper
 Currently available at https://arxiv.org/abs/2110.14763
 
-(under journal review)
+(Accepted by IEEE TVT on June 27, 2022)
 
 ## II. Server Setup
 ### System Requirement
