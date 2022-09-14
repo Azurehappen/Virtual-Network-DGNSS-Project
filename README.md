@@ -8,9 +8,7 @@ Contact: whu027@ucr.edu
 Copyright (c) 2020 UC Regents
 
 ## I. Paper
-Currently available at https://arxiv.org/abs/2110.14763
-
-(Accepted by IEEE TVT on June 24, 2022)
+W. Hu, A. Neupane and J. A. Farrell, "Using PPP Information to Implement a Global Real-Time Virtual Network DGNSS Approach," in IEEE Transactions on Vehicular Technology, 2022, doi: 10.1109/TVT.2022.3187416.
 
 ## II. Server Setup
 ### System Requirement
