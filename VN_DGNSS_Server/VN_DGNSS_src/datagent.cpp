@@ -177,7 +177,7 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
                                   std::vector<std::vector<double>> &phw_track,
                                   int log_count) {
   getgpstnow();
-  bool log_out = false;
+  bool log_out = true;
   if (log_count%60 == 1) { // record log by every 1 minute
     log_out = true;
   }
@@ -407,19 +407,13 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
         IonoDelay ido(ustec_data.data, user_pos);
         std::vector<double> elaz = ido.ElevationAzimuthComputation(sat_pos_precise);
         double user_elev = elaz[0];
-        //int vtec_check = ido.VerticalTECComputation(sat_pos_precise);
-        //double user_elev = ido.GetElevation();
-        // if (vtec_check == -1) {
-          if (user_elev <= ELEVMASK) {
-//            rst << sys_string(sys) << prn << " elev: " << user_elev << std::endl;
-          } else {
-            if (log_out) {
-              rst << sys_string(sys) << prn << " can't compute Iono corr" << std::endl;
-            }
+        if (user_elev <= ELEVMASK) {
+          if (log_out) {
+            rst << sys_string(sys) << prn << " elev: " << user_elev << std::endl;
           }
-        //  phw_track[sys_i][prn] = 0;
-        //  continue;
-        // }
+          phw_track[sys_i][prn] = 0;
+          continue;
+        }
 
         // compute ionospheric delay
         double iono_delay_L1 = 0, iono_delay_L2 = 0;
@@ -453,6 +447,9 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
         double trop_IGG = IGG.IGGtropdelay(uLon*R2D,user_lat*R2D,user_h/1000,
                                            doy,user_elev,TropData.data);
 
+        single_bias code_bias_f1 = cbias_sv.data[prn].bias_ele[infor.code_F1[sys_i]];
+        single_bias phase_bias_f1 = pbias_sv.data[prn].bias_ele[infor.code_F1[sys_i]];
+
         if (isnan(norm_range)) {
           rst << "sat prc pos rotated: " << std::setprecision(13) << " "
               << sat_pos_precise[0] << " " << sat_pos_precise[1] << " "
@@ -462,10 +459,16 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
           rst << "timedoff now to ssr: "<<timediff(gpst_now,t_obt)
               <<" "<<timediff(gpst_now,t_clk) <<std::endl;
         }
+        if (!code_bias_f1.check) {
+          phw_track[sys_i][prn] = 0;
+          continue;
+        }
         data[num_sv].sat = satno(sys,prn);
         data[num_sv].time = gpst_now;
+        // Use GIPP bias product: CLIGHT * cbias_sv1[prn].value * 1e-9
+        // Use CNES SSR bias product: code_bias_f1.value
         data[num_sv].P[0] = norm_range - delt_sv +
-                      CLIGHT * cbias_sv1[prn].value * 1e-9+
+                      code_bias_f1.value +
                       iono_delay_L1 + trop_IGG;
         int intL1 = 15;
         data[num_sv].L[0] = 0;
@@ -479,6 +482,7 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
               << " Eph_diff: " << std::setprecision(5) << eph_tdiff
               << " IODE " << eph_sv[ver][prn].IODE
               << " L1 code: " << std::setprecision(12) << data[num_sv].P[0]
+              << " cbias " << std::setprecision(3) << code_bias_f1.value
               << " IGGTrop: " << std::setprecision(4) << trop_IGG
               << " Iono: " << std::setprecision(5) << iono_delay_L1
               //<< " phw: " << setprecision(6) << phw
