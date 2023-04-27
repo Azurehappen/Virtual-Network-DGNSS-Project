@@ -2,7 +2,8 @@ project(rtklib)
 
 cmake_minimum_required(VERSION 3.9)
 
-set(COMPILE_FLAGS "-std=c++17 -Wall -Werror -Wpedantic -O3")
+set(COMPILE_FLAGS "-Wall -Werror -Wpedantic -O3")
+set(CMAKE_CXX_STANDARD 17)
 set(SOURCE_FILES cmnfunc.cpp rtcm.cpp rtcm3e.cpp)
 set(HEADER_FILES rtklib.h)
 

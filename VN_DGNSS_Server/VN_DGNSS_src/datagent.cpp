@@ -100,6 +100,7 @@ void datagent::getcorrdata(requestor_BKG *foo_bkg, requestor_web *foo_web,
   orbit_data = foo_bkg->get_orbit_data();
   // get hardware bias
   code_bias = foo_web->get_code_bias();
+  phase_bias = foo_web->get_phase_bias();
   code_bias_ssr = foo_bkg->get_code_bias();
   phase_bias_ssr = foo_bkg->get_phase_bias();
   // phase_bias = foo_web->get_phase_bias();
@@ -276,10 +277,11 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
   for (int sys_i = 0; sys_i < 3; sys_i++) {
     // Checking if the corresponding system requested by client
     if (infor.sys[sys_i] && infor.code_F1[sys_i] != -1) {
-      std::vector<bias_element> cbias_sv1, cbias_sv2;
+      std::vector<SatBias> cbias_sv1, cbias_sv2;
+      std::vector<SatBias> pbias_sv1, pbias_sv2;
       cbias_ver cbias_sv;
       pbias_ver pbias_sv;
-      std::vector<SatPosClkComp::Ephemeris> eph_sv[EPH_VERMAX];
+      std::vector<SatStruct::Ephemeris> eph_sv[EPH_VERMAX];
       double sys_F1, sys_F2;
       switch (sys_i) {
       case 0:
@@ -287,8 +289,10 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
         max_prn = MAXPRNGPS;
         cbias_sv = code_bias_ssr.GPS;
         pbias_sv = phase_bias_ssr.GPS;
-        cbias_sv1 = code_bias.cbias_GPS[infor.code_F1[sys_i]]; // GIPP data
-        cbias_sv2 = code_bias.cbias_GPS[infor.code_F2[sys_i]]; // GIPP data
+        cbias_sv1 = code_bias.bias_GPS[infor.code_F1[sys_i]];
+        cbias_sv2 = code_bias.bias_GPS[infor.code_F2[sys_i]];
+        pbias_sv1 = phase_bias.bias_GPS[infor.code_F1[sys_i]];
+        pbias_sv2 = phase_bias.bias_GPS[infor.code_F2[sys_i]];
         for (int j=0;j<EPH_VERMAX;j++) { // Copy different version
           eph_sv[j] = eph_data[j].GPS_eph;
         }
@@ -300,8 +304,10 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
         max_prn = MAXPRNGAL;
         cbias_sv = code_bias_ssr.GAL;
         pbias_sv = phase_bias_ssr.GAL;
-        cbias_sv1 = code_bias.cbias_GAL[infor.code_F1[sys_i]];
-        cbias_sv2 = code_bias.cbias_GAL[infor.code_F2[sys_i]];
+        cbias_sv1 = code_bias.bias_GAL[infor.code_F1[sys_i]];
+        cbias_sv2 = code_bias.bias_GAL[infor.code_F2[sys_i]];
+        pbias_sv1 = phase_bias.bias_GAL[infor.code_F1[sys_i]];
+        pbias_sv2 = phase_bias.bias_GAL[infor.code_F2[sys_i]];
         for (int j=0;j<EPH_VERMAX;j++) {
           eph_sv[j] = eph_data[j].GAL_eph;
         }
@@ -313,8 +319,10 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
         max_prn = MAXPRNCMP;
         cbias_sv = code_bias_ssr.BDS;
         pbias_sv = phase_bias_ssr.BDS;
-        cbias_sv1 = code_bias.cbias_BDS[infor.code_F1[sys_i]];
-        cbias_sv2 = code_bias.cbias_BDS[infor.code_F2[sys_i]];
+        cbias_sv1 = code_bias.bias_BDS[infor.code_F1[sys_i]];
+        cbias_sv2 = code_bias.bias_BDS[infor.code_F2[sys_i]];
+        pbias_sv1 = phase_bias.bias_BDS[infor.code_F1[sys_i]];
+        pbias_sv2 = phase_bias.bias_BDS[infor.code_F2[sys_i]];
         for (int j=0;j<EPH_VERMAX;j++) {
           eph_sv[j] = eph_data[j].BDS_eph;
         }
@@ -468,8 +476,8 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
         // Use GIPP bias product: CLIGHT * cbias_sv1[prn].value * 1e-9
         // Use CNES SSR bias product: code_bias_f1.value
         data[num_sv].P[0] = norm_range - delt_sv +
-                      code_bias_f1.value +
-                      iono_delay_L1 + trop_IGG;
+                            CLIGHT * cbias_sv1[prn].value * 1e-9 +
+                            iono_delay_L1 + trop_IGG;
         int intL1 = 15;
         data[num_sv].L[0] = 0;
         data[num_sv].SNR[0] = (unsigned char)(floor(72 * user_elev / (3 * PI)) + 41) * 4;

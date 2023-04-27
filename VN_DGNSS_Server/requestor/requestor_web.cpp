@@ -3,7 +3,7 @@
 
 // Write function for curl
 size_t requestor_web::write_to_buffer(void *contents, size_t size, size_t nmemb,
-                                  void *userp) {
+                                      void *userp) {
   size_t n = size * nmemb;
   ((std::string *)userp)->append((char *)contents, n);
   return n;
@@ -11,9 +11,9 @@ size_t requestor_web::write_to_buffer(void *contents, size_t size, size_t nmemb,
 
 // Write website compressed file to local file
 size_t requestor_web::write_to_compress_file(void *buffer, size_t size,
-                                         size_t nmemb, void *stream){
+                                             size_t nmemb, void *stream) {
   auto fileout = (FtpFile *)stream;
-  if(fileout && !fileout->fp) { // aviod reopen file
+  if (fileout && !fileout->fp) {  // aviod reopen file
     fileout->fp = fopen(fileout->filepath, "wb");
     if (!fileout->fp) {
       return -1;
@@ -38,11 +38,13 @@ bool requestor_web::download_file(const char *url, const char *file_path) {
     res = curl_easy_perform(curl);
     if (fileout.fp) {
       fclose(fileout.fp);
+    } else {
+      return false;
     }
-    else {return false;}
     if (res != CURLE_OK) {
-      log_WEB << get_time() << " curl_easy_perform() failed: "
-              << curl_easy_strerror(res) << std::endl;
+      log_WEB << get_time()
+              << " curl_easy_perform() failed: " << curl_easy_strerror(res)
+              << std::endl;
       curl_easy_cleanup(curl);
       curl_global_cleanup();
       return false;
@@ -71,8 +73,9 @@ bool requestor_web::read_webpage(const char *url, std::string &buffer) {
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, TIMEOUT);
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      log_WEB << get_time() << "code bias: curl_easy_perform() failed: "
-              << curl_easy_strerror(res) << std::endl;
+      log_WEB << get_time()
+              << "Bias: curl_easy_perform() failed: " << curl_easy_strerror(res)
+              << std::endl;
       curl_easy_cleanup(curl);
       curl_global_cleanup();
       return false;
@@ -89,7 +92,8 @@ bool requestor_web::read_webpage(const char *url, std::string &buffer) {
 }
 
 // Clear stringstream and input line string
-void requestor_web::clear_input_stream(std::stringstream &ss, std::string &line) {
+void requestor_web::clear_input_stream(std::stringstream &ss,
+                                       std::string &line) {
   ss.clear();
   ss.str("");
   ss << line;
@@ -109,8 +113,9 @@ bool requestor_web::request_ustec_data() {
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, TIMEOUT);
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      log_WEB << get_time() << "USTEC curl_easy_perform() failed: "
-              << curl_easy_strerror(res) << std::endl;
+      log_WEB << get_time()
+              << "USTEC curl_easy_perform() failed: " << curl_easy_strerror(res)
+              << std::endl;
     } else {
       std::stringstream ifs(buffer);
       ustec new_ustec_data;
@@ -122,7 +127,7 @@ bool requestor_web::request_ustec_data() {
             if (line == ustec_fname) {
               curl_easy_cleanup(curl);
               curl_global_cleanup();
-              //log_ofs << get_time() << "USTEC not update, back" << std::endl;
+              // log_ofs << get_time() << "USTEC not update, back" << std::endl;
               return false;
             }
             ustec_fname = line;
@@ -173,129 +178,130 @@ bool requestor_web::request_ustec_data() {
 }
 
 // Read line GPS data
-void requestor_web::read_GPS_cbias(int sv_prn, double value,
-                                   const std::string &TYPE,
-                                   code_bias_strc &cbias) {
+void requestor_web::ReadGpsBiasCorr(int sv_prn, double value,
+                                    const std::string &TYPE,
+                                    BiasCorrData &bias) {
   if (TYPE.find("C1C") != std::string::npos) {
-    cbias.cbias_GPS[code_GPS_C1C][sv_prn].prn = sv_prn;
-    cbias.cbias_GPS[code_GPS_C1C][sv_prn].value = value;
+    bias.bias_GPS[code_GPS_C1C][sv_prn].prn = sv_prn;
+    bias.bias_GPS[code_GPS_C1C][sv_prn].value = value;
   } else if (TYPE.find("C1W") != std::string::npos) {
-    cbias.cbias_GPS[code_GPS_C1W][sv_prn].prn = sv_prn;
-    cbias.cbias_GPS[code_GPS_C1W][sv_prn].value = value;
+    bias.bias_GPS[code_GPS_C1W][sv_prn].prn = sv_prn;
+    bias.bias_GPS[code_GPS_C1W][sv_prn].value = value;
   } else if (TYPE.find("C2C") != std::string::npos) {
-    cbias.cbias_GPS[code_GPS_C2C][sv_prn].prn = sv_prn;
-    cbias.cbias_GPS[code_GPS_C2C][sv_prn].value = value;
+    bias.bias_GPS[code_GPS_C2C][sv_prn].prn = sv_prn;
+    bias.bias_GPS[code_GPS_C2C][sv_prn].value = value;
   } else if (TYPE.find("C2W") != std::string::npos) {
-    cbias.cbias_GPS[code_GPS_C2W][sv_prn].prn = sv_prn;
-    cbias.cbias_GPS[code_GPS_C2W][sv_prn].value = value;
+    bias.bias_GPS[code_GPS_C2W][sv_prn].prn = sv_prn;
+    bias.bias_GPS[code_GPS_C2W][sv_prn].value = value;
   } else if (TYPE.find("C2L") != std::string::npos) {
-    cbias.cbias_GPS[code_GPS_C2L][sv_prn].prn = sv_prn;
-    cbias.cbias_GPS[code_GPS_C2L][sv_prn].value = value;
+    bias.bias_GPS[code_GPS_C2L][sv_prn].prn = sv_prn;
+    bias.bias_GPS[code_GPS_C2L][sv_prn].value = value;
   }
 }
 
-void requestor_web::read_GAL_cbias(int sv_prn, double value,
-                                   const std::string &TYPE,
-                                   code_bias_strc &cbias) {
+void requestor_web::ReadGalBiasCorr(int sv_prn, double value,
+                                    const std::string &TYPE,
+                                    BiasCorrData &bias) {
   if (TYPE.find("C1C") != std::string::npos) {
-    cbias.cbias_GAL[code_GAL_C1C][sv_prn].prn = sv_prn;
-    cbias.cbias_GAL[code_GAL_C1C][sv_prn].value = value;
+    bias.bias_GAL[code_GAL_C1C][sv_prn].prn = sv_prn;
+    bias.bias_GAL[code_GAL_C1C][sv_prn].value = value;
   } else if (TYPE.find("C1X") != std::string::npos) {
-    cbias.cbias_GAL[code_GAL_C1X][sv_prn].prn = sv_prn;
-    cbias.cbias_GAL[code_GAL_C1X][sv_prn].value = value;
+    bias.bias_GAL[code_GAL_C1X][sv_prn].prn = sv_prn;
+    bias.bias_GAL[code_GAL_C1X][sv_prn].value = value;
   } else if (TYPE.find("C6C") != std::string::npos) {
-    cbias.cbias_GAL[code_GAL_C6C][sv_prn].prn = sv_prn;
-    cbias.cbias_GAL[code_GAL_C6C][sv_prn].value = value;
+    bias.bias_GAL[code_GAL_C6C][sv_prn].prn = sv_prn;
+    bias.bias_GAL[code_GAL_C6C][sv_prn].value = value;
   } else if (TYPE.find("C5Q") != std::string::npos) {
-    cbias.cbias_GAL[code_GAL_C5Q][sv_prn].prn = sv_prn;
-    cbias.cbias_GAL[code_GAL_C5Q][sv_prn].value = value;
+    bias.bias_GAL[code_GAL_C5Q][sv_prn].prn = sv_prn;
+    bias.bias_GAL[code_GAL_C5Q][sv_prn].value = value;
   } else if (TYPE.find("C5X") != std::string::npos) {
-    cbias.cbias_GAL[code_GAL_C5X][sv_prn].prn = sv_prn;
-    cbias.cbias_GAL[code_GAL_C5X][sv_prn].value = value;
+    bias.bias_GAL[code_GAL_C5X][sv_prn].prn = sv_prn;
+    bias.bias_GAL[code_GAL_C5X][sv_prn].value = value;
   } else if (TYPE.find("C7Q") != std::string::npos) {
-    cbias.cbias_GAL[code_GAL_C7Q][sv_prn].prn = sv_prn;
-    cbias.cbias_GAL[code_GAL_C7Q][sv_prn].value = value;
+    bias.bias_GAL[code_GAL_C7Q][sv_prn].prn = sv_prn;
+    bias.bias_GAL[code_GAL_C7Q][sv_prn].value = value;
   } else if (TYPE.find("C7X") != std::string::npos) {
-    cbias.cbias_GAL[code_GAL_C7X][sv_prn].prn = sv_prn;
-    cbias.cbias_GAL[code_GAL_C7X][sv_prn].value = value;
+    bias.bias_GAL[code_GAL_C7X][sv_prn].prn = sv_prn;
+    bias.bias_GAL[code_GAL_C7X][sv_prn].value = value;
   }
 }
+
 // BDS-2 : prn 1-18; BDS-3: PRN 19-61
 // B2 feq channel: C7I for BDS-2, C7Z for BDS-3
-void requestor_web::read_BDS_cbias(int sv_prn, double value,
-                                   const std::string &TYPE,
-                                   code_bias_strc &cbias) {
+void requestor_web::ReadBdsBiasCorr(int sv_prn, double value,
+                                    const std::string &TYPE,
+                                    BiasCorrData &cbias) {
   if (TYPE.find("C2I") != std::string::npos) {
-    cbias.cbias_BDS[code_BDS_C2I][sv_prn].prn = sv_prn;
-    cbias.cbias_BDS[code_BDS_C2I][sv_prn].value = value;
+    cbias.bias_BDS[code_BDS_C2I][sv_prn].prn = sv_prn;
+    cbias.bias_BDS[code_BDS_C2I][sv_prn].value = value;
   } else if (TYPE.find("C6I") != std::string::npos) {
-    cbias.cbias_BDS[code_BDS_C6I][sv_prn].prn = sv_prn;
-    cbias.cbias_BDS[code_BDS_C6I][sv_prn].value = value;
-  } else if (TYPE.find("C7I") != std::string::npos && sv_prn<=18) {
-    cbias.cbias_BDS[code_BDS_C7][sv_prn].prn = sv_prn;
-    cbias.cbias_BDS[code_BDS_C7][sv_prn].value = value;
-  } else if (TYPE.find("C7Z") != std::string::npos && sv_prn>18) {
-    cbias.cbias_BDS[code_BDS_C7][sv_prn].prn = sv_prn;
-    cbias.cbias_BDS[code_BDS_C7][sv_prn].value = value;
+    cbias.bias_BDS[code_BDS_C6I][sv_prn].prn = sv_prn;
+    cbias.bias_BDS[code_BDS_C6I][sv_prn].value = value;
+  } else if (TYPE.find("C7I") != std::string::npos && sv_prn <= 18) {
+    cbias.bias_BDS[code_BDS_C7][sv_prn].prn = sv_prn;
+    cbias.bias_BDS[code_BDS_C7][sv_prn].value = value;
+  } else if (TYPE.find("C7Z") != std::string::npos && sv_prn > 18) {
+    cbias.bias_BDS[code_BDS_C7][sv_prn].prn = sv_prn;
+    cbias.bias_BDS[code_BDS_C7][sv_prn].value = value;
   }
 }
 
-// Parse MGEX Code Bias-SINEX file
-bool requestor_web::parse_code_bias(const std::string &buffer) {
+// Parse MGEX Bias-SINEX file
+std::optional<BiasCorrData> requestor_web::parse_code_bias(
+    const std::vector<char> &buffer, const std::string &val_title) {
   std::string line;
-  std::stringstream biasf(buffer);
-  int prn_st, type_st,
-      value_st;  // Start position of PRN, OBS TYPE, VALUE in the string
-  bool check = false;
+  std::string buff_str(buffer.begin(), buffer.end());
+  std::istringstream bias_stream(buff_str);
+  // Start position of PRN, OBS TYPE, VALUE in the string
+  int prn_st, type_st, value_st;
+  bool find_data = false;
   // Read until to the data struct header
-  while (getline(biasf, line)) {
+  while (std::getline(bias_stream, line)) {
     if (line.find("*BIAS SVN_ PRN") != std::string::npos) {
       prn_st = line.find("PRN");
       type_st = line.find("OBS1");
-      value_st = line.find("VALUE____");
-      check = true;
+      value_st = line.find(val_title);
+      find_data = true;
       break;
     }
   }
-  code_bias_strc new_code_bias;
-  // Read bias data
-  if (check) {
-    while (getline(biasf, line)) {
-      if (line.find("-BIAS/SOLUTION") != std::string::npos) {
-        break;  // Data end
-      }
-      std::string PRN = line.substr(prn_st, sizeof("PRN"));
-      std::string TYPE = line.substr(type_st, sizeof("OBS1"));
-      std::string VALUE_s = line.substr(value_st, sizeof("VALUE____"));
-      std::stringstream VALUE_ss(VALUE_s);
-      double value;
-      VALUE_ss >> value;
-      if (PRN[0] == 'G') {
-        int sv_prn = std::stoi(PRN.substr(1, line.size() - 1));
-        read_GPS_cbias(sv_prn, value, TYPE, new_code_bias);
-      } else if (PRN[0] == 'E') {
-        int sv_prn = std::stoi(PRN.substr(1, line.size() - 1));
-        read_GAL_cbias(sv_prn, value, TYPE, new_code_bias);
-      } else if (PRN[0] == 'C') {
-        int sv_prn = std::stoi(PRN.substr(1, line.size() - 1));
-        read_BDS_cbias(sv_prn, value, TYPE, new_code_bias);
-      }
-    }
-    std::lock_guard<std::mutex> lock(code_mutex);
-    code_bias = new_code_bias;
-    return true;
+  if (!find_data) {
+    return std::nullopt;
   }
-  return check;
+  BiasCorrData new_bias;
+  // Read bias data
+  while (getline(bias_stream, line)) {
+    if (line.find("-BIAS/SOLUTION") != std::string::npos) {
+      break;
+    }
+    std::string PRN = line.substr(prn_st, sizeof("PRN"));
+    std::string TYPE = line.substr(type_st, sizeof("OBS1"));
+    std::string VALUE_s = line.substr(value_st, val_title.size());
+    std::stringstream VALUE_ss(VALUE_s);
+    double value;
+    VALUE_ss >> value;
+    if (PRN[0] == 'G') {
+      int sv_prn = std::stoi(PRN.substr(1, line.size() - 1));
+      ReadGpsBiasCorr(sv_prn, value, TYPE, new_bias);
+    } else if (PRN[0] == 'E') {
+      int sv_prn = std::stoi(PRN.substr(1, line.size() - 1));
+      ReadGalBiasCorr(sv_prn, value, TYPE, new_bias);
+    } else if (PRN[0] == 'C') {
+      int sv_prn = std::stoi(PRN.substr(1, line.size() - 1));
+      ReadBdsBiasCorr(sv_prn, value, TYPE, new_bias);
+    }
+  }
+  return new_bias;
 }
 
 // Establish connection to CODE bias url and write the data to buffer
 bool requestor_web::request_code_bias() {
   int year = get_year();
   std::string CD_BIAS_URL = CODE_BIAS_URL_header + std::to_string(year) + '/';
-  std::string buffer{},line, OSB_ss{};
-  log_WEB << get_time() << "read code bias data source list" <<std::endl;
-  if (!read_webpage(CD_BIAS_URL.c_str(),buffer)) {
-    log_WEB << "read data list failed" <<std::endl;
+  std::string buffer{}, line, OSB_ss{};
+  log_WEB << get_time() << "read code bias data source list" << std::endl;
+  if (!read_webpage(CD_BIAS_URL.c_str(), buffer)) {
+    log_WEB << "read data list failed" << std::endl;
     return false;
   }
   std::stringstream ifs(buffer);
@@ -306,14 +312,15 @@ bool requestor_web::request_code_bias() {
     }
   }
   if (OSB_ss.empty()) {
-    log_WEB << get_time()
-            << "get code bias file name failure: " << std::endl;
+    log_WEB << get_time() << "get code bias file name failure: " << std::endl;
     return false;
   }
   std::string tmp, fname;
   std::stringstream ss(line);
   // detach the first 8 columns
-  for(int i = 0; i < 8; ++i) {ss >> tmp;}
+  for (int i = 0; i < 8; ++i) {
+    ss >> tmp;
+  }
   ss >> fname;
   if (fname == code_bias_fname) {
     log_WEB << get_time() << "get code bias file, but data not update"
@@ -321,36 +328,128 @@ bool requestor_web::request_code_bias() {
     return true;
   }
   CD_BIAS_URL = CD_BIAS_URL + fname;
-  log_WEB << get_time() << "get code bias link: " << CD_BIAS_URL
-          << std::endl;
+  log_WEB << get_time() << "get code bias link: " << CD_BIAS_URL << std::endl;
   std::string data_path = FILE_PATH + "code_bias.BIA.gz";
   // 2. Download and uncompress code bias file
-  if (!download_file(CD_BIAS_URL.c_str(),data_path.c_str())) {
+  if (!download_file(CD_BIAS_URL.c_str(), data_path.c_str())) {
     log_WEB << get_time() << "Download failed" << std::endl;
     return false;
   }
-  gzFile fp = gzopen(data_path.c_str(),"rb");
+  gzFile fp = gzopen(data_path.c_str(), "rb");
   if (fp == nullptr) {
     log_WEB << get_time() << "file not exist" << std::endl;
     return false;
   }
-  char data[100000] = {0};
-  int size = gzread(fp,data,sizeof(data));
+  std::vector<char> data;
+  const int bufferSize = 4096;
+  char sub_data_buff[bufferSize];
+  int bytesRead;
+  while ((bytesRead = gzread(fp, sub_data_buff, sizeof(sub_data_buff))) > 0) {
+    data.insert(data.end(), sub_data_buff, sub_data_buff + bytesRead);
+  }
   gzclose(fp);
+
   int n = remove(data_path.c_str());
-  if(n == -1) {
-    log_WEB << get_time() << "remove code bias file failure: "
-            << strerror(errno) <<std::endl;
+  if (n == -1) {
+    log_WEB << get_time()
+            << "remove code bias file failure: " << strerror(errno)
+            << std::endl;
     return false;
-  };
-  if (size > 0) {
-    if (!parse_code_bias(data)) {
-      log_WEB << get_time() << "Parse code bias failure" << std::endl;
-      return false;
-    }
+  }
+  if (data.empty()) {
+    log_WEB << get_time() << "No code bias data in the file" << std::endl;
+    return false;
+  }
+  auto code_bias_data = parse_code_bias(data, "VALUE____");
+  if (code_bias_data.has_value()) {
+    std::lock_guard<std::mutex> lock(code_mutex);
+    code_bias = code_bias_data.value();
+  } else {
+    log_WEB << get_time() << "Parse code bias failure" << std::endl;
+    return false;
   }
   code_bias_fname = fname;
   log_WEB << get_time() << "received code bias" << std::endl;
+  return true;
+}
+
+// Establish connection to PRIDE phase bias url and write the data to buffer
+bool requestor_web::request_phase_bias() {
+  int year = get_year();
+  std::string P_BIAS_URL =
+      PHASE_BIAS_URL_header + std::to_string(year) + "/bias/";
+  std::string buffer{}, line, OSB_ss{};
+  log_WEB << get_time() << "read phase bias data source list" << std::endl;
+  if (!read_webpage(P_BIAS_URL.c_str(), buffer)) {
+    log_WEB << "read data list failed" << std::endl;
+    return false;
+  }
+  std::stringstream ifs(buffer);
+  while (ifs.peek() != EOF) {
+    getline(ifs, line);
+    if (line.find("ABS.BIA.gz") != std::string::npos) {
+      OSB_ss = line;
+    }
+  }
+  if (OSB_ss.empty()) {
+    log_WEB << get_time() << "get phase bias file name failure: " << std::endl;
+    return false;
+  }
+  std::string tmp, fname;
+  std::stringstream ss(line);
+  // detach the first 8 columns
+  for (int i = 0; i < 8; ++i) {
+    ss >> tmp;
+  }
+  ss >> fname;
+  if (fname == phase_bias_fname) {
+    log_WEB << get_time() << "get phase bias file, but data not update"
+            << std::endl;
+    return true;
+  }
+  P_BIAS_URL = P_BIAS_URL + fname;
+  log_WEB << get_time() << "get phase bias link: " << P_BIAS_URL << std::endl;
+  std::string data_path = FILE_PATH + "phase_bias.BIA.gz";
+  // 2. Download and uncompress code bias file
+  if (!download_file(P_BIAS_URL.c_str(), data_path.c_str())) {
+    log_WEB << get_time() << "Download failed" << std::endl;
+    return false;
+  }
+  gzFile fp = gzopen(data_path.c_str(), "rb");
+  if (fp == nullptr) {
+    log_WEB << get_time() << "file not exist" << std::endl;
+    return false;
+  }
+  std::vector<char> data;
+  const int bufferSize = 4096;
+  char sub_data_buff[bufferSize];
+  int bytesRead;
+  while ((bytesRead = gzread(fp, sub_data_buff, sizeof(sub_data_buff))) > 0) {
+    data.insert(data.end(), sub_data_buff, sub_data_buff + bytesRead);
+  }
+  gzclose(fp);
+
+  int n = remove(data_path.c_str());
+  if (n == -1) {
+    log_WEB << get_time()
+            << "remove phase bias file failure: " << strerror(errno)
+            << std::endl;
+    return false;
+  }
+  if (data.empty()) {
+    log_WEB << get_time() << "No phase bias data in the file" << std::endl;
+    return false;
+  }
+  auto phase_bias_data = parse_code_bias(data, "__ESTIMATED_VALUE____");
+  if (phase_bias_data.has_value()) {
+    std::lock_guard<std::mutex> lock(phase_mutex);
+    phase_bias = phase_bias_data.value();
+  } else {
+    log_WEB << get_time() << "Parse phase bias failure" << std::endl;
+    return false;
+  }
+  phase_bias_fname = fname;
+  log_WEB << get_time() << "received phase bias" << std::endl;
   return true;
 }
 
@@ -376,7 +475,10 @@ void requestor_web::request_web_data() {
    */
   while (!request_code_bias())
     ;
-  std::cout << "Initial request code_bias success" << std::endl;
+  std::cout << "Initial request code bias success" << std::endl;
+  while (!request_phase_bias())
+    ;
+  std::cout << "Initial request phase bias success" << std::endl;
   ready = true;
   while (!done) {
     gettimeofday(&tv, &tz);
@@ -394,18 +496,25 @@ void requestor_web::request_web_data() {
         code_t = now;
       }
     }
+    if (now / HW_PERIOD != phase_t / HW_PERIOD) {
+      log_WEB << get_time() << "requesting phase bias from PRIDE" << std::endl;
+      if (request_phase_bias()) {
+        phase_t = now;
+      }
+    }
     // update log file
     if (now / HW_PERIOD != file_t / HW_PERIOD) {
       log_WEB.close();
       log_path[2] = log_path[1];
       log_path[1] = log_path[0];
-      log_path[0] = FILE_PATH + "requestor_WEB_"+ get_time_log() + ".log";
+      log_path[0] = FILE_PATH + "requestor_WEB_" + get_time_log() + ".log";
       log_WEB.open(log_path[0].c_str());
-      if (!log_WEB.is_open() ) {
+      if (!log_WEB.is_open()) {
         fprintf(stderr, "requestor new WEB log file cannot be opened\n");
       }
       if (!log_path[2].empty()) {
-        remove(log_path[2].c_str()); // Remove file from two days before
+        // Remove file from two days before
+        remove(log_path[2].c_str());
         log_path->clear();
       }
       file_t = now;
@@ -421,9 +530,14 @@ ustec requestor_web::get_ustec_data() {
   return ustec_data;
 }
 
-code_bias_strc requestor_web::get_code_bias() {
+BiasCorrData requestor_web::get_code_bias() {
   std::lock_guard<std::mutex> lock(code_mutex);
   return code_bias;
+}
+
+BiasCorrData requestor_web::get_phase_bias() {
+  std::lock_guard<std::mutex> lock(phase_mutex);
+  return phase_bias;
 }
 
 // start data request
@@ -432,9 +546,9 @@ void requestor_web::start_request() {
   //    ;
   done = false;
   ready = false;
-  log_path[0] = FILE_PATH + "requestor_WEB_"+ get_time_log() + ".log";
+  log_path[0] = FILE_PATH + "requestor_WEB_" + get_time_log() + ".log";
   log_WEB.open(log_path[0].c_str());
-  if (!log_WEB.is_open() ) {
+  if (!log_WEB.is_open()) {
     fprintf(stderr, "requestor log file cannot be opened\n");
   }
   pthread_create(&pid, nullptr, request_web_wrapper, this);

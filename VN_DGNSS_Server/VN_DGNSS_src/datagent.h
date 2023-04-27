@@ -1,13 +1,13 @@
 #pragma once
+#include "IGGtrop.h"
 #include "IonoDelay.h"
 #include "SatPosClkComp.h"
 #include "data2rtcm.h"
 #include "geoid.h"
-#include "requestor_web.h"
 #include "requestor_BKG.h"
+#include "requestor_web.h"
 #include "rtklib.h"
-#include "timecmn.h"
-#include "IGGtrop.h"
+#include "time_common_func.h"
 
 struct sys_infor {
   // System check, sys[0] GPS, sys[1] GAL, sys[2] BDS
@@ -48,7 +48,8 @@ class datagent {
   vtec_t vtec_CNE;
   std::vector<ssr_clock> clock_data;
   std::vector<ssr_orbit> orbit_data;
-  code_bias_strc code_bias;
+  BiasCorrData code_bias;
+  BiasCorrData phase_bias;
   cbias_ssr code_bias_ssr;
   pbias_ssr phase_bias_ssr;
   //std::vector<gps_phase_bias> phase_bias;

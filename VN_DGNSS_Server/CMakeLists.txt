@@ -2,11 +2,13 @@ project(VN_DGNSS_Server)
 
 cmake_minimum_required(VERSION 3.9)
 
+add_subdirectory(common)
 add_subdirectory(rtklib)
 add_subdirectory(VN_DGNSS_src)
 add_subdirectory(requestor)
 
-set(COMPILE_FLAGS "-std=c++17 -Wall -Werror -Wpedantic -O3 -pthread")
+set(COMPILE_FLAGS "-Wall -Werror -Wpedantic -O3 -pthread")
+set(CMAKE_CXX_STANDARD 17)
 set(SOURCE_FILES server.cpp)
 set(HEADER_FILES server.h)
 

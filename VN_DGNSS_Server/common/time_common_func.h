@@ -1,7 +1,6 @@
 #pragma once
 #include <sys/time.h>
 #include <sys/timerfd.h>
-#include "SatPosClkComp.h"
 #include "rtklib.h"
 #include <arpa/inet.h>
 #include <unistd.h>

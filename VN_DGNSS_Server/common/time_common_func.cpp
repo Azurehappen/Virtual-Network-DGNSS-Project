@@ -1,4 +1,4 @@
-#include "timecmn.h"
+#include "time_common_func.h"
 
 int make_periodic(unsigned int period_micro_second, periodic_info_t &info) {
   int ret;
