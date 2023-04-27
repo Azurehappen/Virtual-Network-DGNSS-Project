@@ -1,9 +1,9 @@
-#include "datagent.h"
+#include "epoch_generation_helper.h"
+#include "ssr_vtec_correction_model.h"
 #include <iomanip>
 #include <iostream>
 #include <utility>
-#include "SSR_VTEC.h"
-static void out_to_file_datetime(std::ostream &rst, std::vector<double> datetime) {
+static void ReportDatetime(std::ostream &rst, std::vector<double> datetime) {
   rst << std::setfill('0')<<std::setw(4)<< (int) datetime[0] << " "
       << std::setfill('0')<<std::setw(2)<< (int) datetime[1] << " "
       << std::setfill('0')<<std::setw(2)<< (int) datetime[2] << " "
@@ -12,7 +12,7 @@ static void out_to_file_datetime(std::ostream &rst, std::vector<double> datetime
       << std::setfill('0')<<std::setw(2)<< (int) datetime[5] << std::endl;
 }
 
-static std::string sys_string(int sys) {
+static std::string GetSystemTypeStr(int sys) {
   if (sys == SYS_GPS) {
     return "G";
   } else if (sys == SYS_GAL) {
@@ -24,7 +24,7 @@ static std::string sys_string(int sys) {
   }
 }
 
-static int infor_to_rtcm_code(int info_code, int sys,int prn) {
+static int SysInforToRtcmCode(int info_code, int sys,int prn) {
   switch (sys) {
   case SYS_GPS: {
     switch (info_code) {
@@ -79,19 +79,14 @@ static int infor_to_rtcm_code(int info_code, int sys,int prn) {
   }
 }
 
-datagent::datagent(std::vector<double> pos_ecef)
+EpochGenerationHelper::EpochGenerationHelper(std::vector<double> pos_ecef)
     : user_pos(std::move(pos_ecef)),
       date_gps(6, 0) {}
 
-datagent::~datagent() = default;
+EpochGenerationHelper::~EpochGenerationHelper() = default;
 
-void datagent::getgpstnow() {
-  vntimefunc::GetGpsTimeNow(date_gps, doy,
-                gpst_now); // get current GPS time and days of year
-}
-
-void datagent::getcorrdata(BkgDataRequestor *foo_bkg, WebDataRequestor *foo_web,
-                           std::ostream &rst) {
+void EpochGenerationHelper::GetPppCorrections(BkgDataRequestor *foo_bkg, WebDataRequestor *foo_web,
+                           std::ostream &client_log) {
   // get USTEC ionospheric data
   ustec_data = foo_web->get_ustec_data();
   // get clock correction data
@@ -105,11 +100,11 @@ void datagent::getcorrdata(BkgDataRequestor *foo_bkg, WebDataRequestor *foo_web,
   phase_bias_ssr = foo_bkg->GetSsrPhaseBiasCorr();
   // get ephemeris data
   eph_data = foo_bkg->GetGnssEphDataEpochs();
-  vtec_CNE = foo_bkg->GetSsrVTecCorr();
+  vtec_ssr = foo_bkg->GetSsrVTecCorr();
 }
 
 // Find orbit data that match the selected PRN.
-bool datagent::orbit_pick(std::ostream &rst, int prn, int sys,
+bool EpochGenerationHelper::SelectSatOrbitCorrection(std::ostream &rst, int prn, int sys,
                           SatOrbitPara &obt_sv, gtime_t &obt_t) {
   for (int i = 0;i<3;i++) {
   SatOrbitPara obt_elem;
@@ -140,7 +135,7 @@ bool datagent::orbit_pick(std::ostream &rst, int prn, int sys,
   return false;
 }
 
-bool datagent::clock_pick(std::ostream &rst, int prn, int sys,
+bool EpochGenerationHelper::SelectSatClockCorrection(std::ostream &rst, int prn, int sys,
                           SatClockPara &clk_sv, gtime_t &clk_t) {
   for (int i = 0;i<3;i++) {
     SatClockPara clk_elem;
@@ -171,14 +166,15 @@ bool datagent::clock_pick(std::ostream &rst, int prn, int sys,
   return false;
 }
 
-bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *foo_web,
-                                  std::ostream &rst, const sys_infor& infor,
-                                  const IGGexpModel& TropData,
+bool EpochGenerationHelper::ConstructGnssMeas(BkgDataRequestor *foo_bkg, WebDataRequestor *foo_web,
+                                  std::ostream &rst, const GnssSystemInfo & infor,
+                                  const IggtropExperimentModel & TropData,
                                   std::vector<std::vector<double>> &phw_track,
                                   int log_count) {
-  getgpstnow();
-  bool log_out = true;
-  if (log_count%60 == 1) { // record log by every 1 minute
+  vntimefunc::GetGpsTimeNow(date_gps, day_of_year, gpst_now);
+  bool log_out = false;
+  if (log_count%60 == 1) {
+    // record log by every 1 minute
     log_out = true;
   }
   if (log_out){
@@ -186,7 +182,7 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
         << date_gps[2] << " " << date_gps[3] << " " << date_gps[4] << " "
         << date_gps[5] << std::endl;
   }
-  getcorrdata(foo_bkg, foo_web, rst);
+  GetPppCorrections(foo_bkg, foo_web, rst);
   double tdiff;
   /* Mute USTEC
   gtime_t t_ustec = epoch2time(ustec_data.time);
@@ -200,7 +196,7 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
   }
   */
 
-  tdiff = difftime(gpst_now.time, vtec_CNE.time.time);
+  tdiff = difftime(gpst_now.time, vtec_ssr.time.time);
   if (log_out) {
     rst << "SSR TEC t_diff: " << (int)(tdiff / 60) << ":"
         << tdiff - 60 * (int)(tdiff / 60) << std::endl;
@@ -210,7 +206,7 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
     }
   }
 
-  if (vtec_CNE.received) {
+  if (vtec_ssr.received) {
     if (log_out) {
       rst << "SSR VTEC used." << std::endl;
     }
@@ -220,7 +216,7 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
   double user_lon = 0;
   double user_h = 0;
   /*  Mute USTEC
-  IonoDelay ido(ustec_data.data, user_pos);
+  UsTecIonoCorrComputer ido(ustec_data.data, user_pos);
   ido.GetLatLonHeight(user_lat, user_lon, user_h);
   */
   // Get LLA in rad
@@ -228,7 +224,7 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
   ecef2pos(user_pos.data(),LLA);
   user_lat = LLA[0];
   user_lon = LLA[1];
-  geoid geoH;
+  GeoidModelHelper geoH;
   // geodetic ellipsoidal separation, compute orthometric height of the receiver
   double Ngeo = geoH.geoidh(user_lat, user_lon);
   user_h = LLA[2] - Ngeo;
@@ -336,24 +332,24 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
         if (sys_i == 2) {
           if (prn<=5||prn==18||prn>=59) {
             if (log_out) {
-              rst << sys_string(sys) << prn << " BDS GEO SAT ignored" << std::endl;
+              rst << GetSystemTypeStr(sys) << prn << " BDS GEO SAT ignored" << std::endl;
             }
             phw_track[sys_i][prn] = 0;
             continue;
           }
         }
         // Pick SSR clock and orbit correction, check the latency
-        if (! (orbit_pick(rst,prn,sys,obt_sv,t_obt)
-            && clock_pick(rst,prn,sys,clk_sv,t_clk)) ) {
+        if (! (SelectSatOrbitCorrection(rst, prn, sys, obt_sv, t_obt)
+            && SelectSatClockCorrection(rst, prn, sys, clk_sv, t_clk)) ) {
           if (log_out) {
-            rst << sys_string(sys) << prn << " No IGS corr" << std::endl;
+            rst << GetSystemTypeStr(sys) << prn << " No IGS corr" << std::endl;
           }
           phw_track[sys_i][prn] = 0;
           continue;
         }
         if (cbias_sv1[prn].prn == -1) {
           if (log_out) {
-            rst << sys_string(sys) << prn << " No code bias corr for freq 1" << std::endl;
+            rst << GetSystemTypeStr(sys) << prn << " No code bias corr for freq 1" << std::endl;
           }
           continue;
         }
@@ -366,7 +362,7 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
         }
         if (ver == -1) {
           if (log_out) {
-            rst << sys_string(sys) << prn << " IOD not match: " << obt_sv.IOD
+            rst << GetSystemTypeStr(sys) << prn << " IOD not match: " << obt_sv.IOD
                 << " EPH_IOD: ";
             for (int j = 0; j < 6; j++) {
               rst << eph_sv[j][prn].IODE << " ";
@@ -383,7 +379,7 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
         if (abs(eph_tdiff) > 7200.0 + 120.0 || eph_sv[ver][prn].svH != 0 ||
             eph_sv[ver][prn].prn == -1) {
           if (log_out) {
-            rst << sys_string(sys) << prn << "(" << eph_sv[ver][prn].prn << ")"
+            rst << GetSystemTypeStr(sys) << prn << "(" << eph_sv[ver][prn].prn << ")"
                 << " sv_H:" << eph_sv[ver][prn].svH << " time diff: "
                 << eph_tdiff << std::endl;
           }
@@ -391,7 +387,7 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
           //record_0(phw_gps_track, prn_idx);
           continue;
         }
-        SatPosClkComp spco(gpst_now, obt_sv.dx_m, obt_sv.dv_m, t_obt, clk_sv.dt_corr_s,
+        SatPosClkComputer spco(gpst_now, obt_sv.dx_m, obt_sv.dv_m, t_obt, clk_sv.dt_corr_s,
                            t_clk, eph_sv[ver][prn],sys);
         // compute propagation time using optimization function
         spco.PropTimeOptm(user_pos);
@@ -411,12 +407,12 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
                                  pow(range_vector[1], 2) +
                                  pow(range_vector[2], 2));
 
-        IonoDelay ido(ustec_data.data, user_pos);
+        UsTecIonoCorrComputer ido(ustec_data.data, user_pos);
         std::vector<double> elaz = ido.ElevationAzimuthComputation(sat_pos_precise);
         double user_elev = elaz[0];
         if (user_elev <= ELEVMASK) {
           if (log_out) {
-            rst << sys_string(sys) << prn << " elev: " << user_elev << std::endl;
+            rst << GetSystemTypeStr(sys) << prn << " elev: " << user_elev << std::endl;
           }
           phw_track[sys_i][prn] = 0;
           continue;
@@ -425,14 +421,14 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
         // compute ionospheric delay
         double iono_delay_L1 = 0, iono_delay_L2 = 0;
         // If SSR VTEC not avaliable, then using USTEC
-        if (vtec_CNE.received) {
-          SSR_VTEC VTEC;
-          iono_delay_L1 = VTEC.stec(vtec_CNE,gpst_now.sec,user_pos,sat_pos_precise,sys_F1);
+        if (vtec_ssr.received) {
+          SsrVtecCorrectionModel VTEC;
+          iono_delay_L1 = VTEC.stec(vtec_ssr,gpst_now.sec,user_pos,sat_pos_precise,sys_F1);
           iono_delay_L2 =
               iono_delay_L1 * (sys_F1 * sys_F1 / (sys_F2 * sys_F2));
         } else {
           if (log_out) {
-            rst << sys_string(sys) << prn << " SSR VTEC data not avaliable" << std::endl;
+            rst << GetSystemTypeStr(sys) << prn << " SSR VTEC data not avaliable" << std::endl;
           }
           /*  // Mute USTEC
           double vtec = ido.GetVTEC();
@@ -444,7 +440,7 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
         }
 
         // compute Tropospheric delay
-        IGGtrop IGG;
+        IggtropCorrectionModel IGG;
         double uLon;
         if (user_lon<=0){
           uLon = -user_lon;
@@ -452,12 +448,12 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
           uLon = -user_lon+2*PI;
         }
         double trop_IGG = IGG.IGGtropdelay(uLon*R2D,user_lat*R2D,user_h/1000,
-                                           doy,user_elev,TropData.data);
+                                           day_of_year,user_elev,TropData.data);
 
         BiasElement code_bias_f1 = cbias_sv.data[prn].bias_ele[infor.code_F1[sys_i]];
         BiasElement phase_bias_f1 = pbias_sv.data[prn].bias_ele[infor.code_F1[sys_i]];
 
-        if (isnan(norm_range)) {
+        if (std::isnan(norm_range)) {
           rst << "sat prc pos rotated: " << std::setprecision(13) << " "
               << sat_pos_precise[0] << " " << sat_pos_precise[1] << " "
               << sat_pos_precise[2] << std::endl;
@@ -481,11 +477,11 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
         data[num_sv].L[0] = 0;
         data[num_sv].SNR[0] = (unsigned char)(floor(72 * user_elev / (3 * PI)) + 41) * 4;
         if (data[num_sv].SNR[0] > 200) {data[num_sv].SNR[0] = 200;}
-        data[num_sv].code[0] = infor_to_rtcm_code(infor.code_F1[sys_i],sys,prn);
+        data[num_sv].code[0] = SysInforToRtcmCode(infor.code_F1[sys_i], sys, prn);
         data[num_sv].rcv = 0;
         data[num_sv].lockt[0] = 0; // Set lock time to 0 aviod receiver using phase
         if (log_out) {
-          rst << sys_string(sys) << prn
+          rst << GetSystemTypeStr(sys) << prn
               << " Eph_diff: " << std::setprecision(5) << eph_tdiff
               << " IODE " << eph_sv[ver][prn].IODE
               << " L1 code: " << std::setprecision(12) << data[num_sv].P[0]
@@ -517,7 +513,7 @@ bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *f
 }
 
 
-void datagent::sendRTCM(SockRTCM *client_info) {
+void EpochGenerationHelper::SendRtcmMsgToClient(SockRTCM *client_info) {
   if (num_sv > 3) {
     int type[16];
     int m = 1; /*Number of OBS message type*/
@@ -531,6 +527,6 @@ void datagent::sendRTCM(SockRTCM *client_info) {
     if (num_in_sys[2]>0) {
       type[m++] = 1124; /* BDS massage type */
     }
-    data2rtcm(num_sv, type, m, client_info, user_pos, data); /* Generate RTCM message */
+    CreateRtcmMsg(num_sv, type, m, client_info, user_pos, data); /* Generate RTCM message */
   }
 }

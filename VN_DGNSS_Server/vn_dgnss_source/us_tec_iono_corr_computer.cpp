@@ -1,7 +1,7 @@
-#include "IonoDelay.h"
+#include "us_tec_iono_corr_computer.h"
 
 /****************************************************************/
-IonoDelay::IonoDelay(std::vector<std::vector<int>>  USTEC_map_file, std::vector<double>  user_location)
+UsTecIonoCorrComputer::UsTecIonoCorrComputer(std::vector<std::vector<int>>  USTEC_map_file, std::vector<double>  user_location)
 :TEC_grid_map(std::move(USTEC_map_file)),
 user_pos_ecef(std::move(user_location)),
 pi(3.14159265358980),
@@ -17,10 +17,10 @@ ecc_e(sqrt((pow(semi_major_axis_len,2)-pow(semi_minor_axis_len,2))/pow(semi_majo
     Earth2LevelRotation();
 }
 /*****************************************************/
-IonoDelay::~IonoDelay() {}
+UsTecIonoCorrComputer::~UsTecIonoCorrComputer() = default;
 
 /***************************************************/
-bool IonoDelay::ParseUSTECFile()
+bool UsTecIonoCorrComputer::ParseUSTECFile()
 {
   std::ifstream USTECdata(USTEC_data_path);
   std::string line;
@@ -67,7 +67,7 @@ bool IonoDelay::ParseUSTECFile()
     return true;
 }
 /******************************************/
-void IonoDelay::ECEF2LatLon(){
+void UsTecIonoCorrComputer::ECEF2LatLon(){
     double_t h = 0;
     double N = semi_major_axis_len;
     double p = sqrt(pow(user_pos_ecef[0],2)+pow(user_pos_ecef[1],2));
@@ -88,7 +88,7 @@ void IonoDelay::ECEF2LatLon(){
     return ;
 }
 
-void IonoDelay::Earth2LevelRotation(){
+void UsTecIonoCorrComputer::Earth2LevelRotation(){
    double slat = sin(user_latitude)  ;
    double clat = cos(user_latitude);
    double slon = sin(user_longitude);
@@ -108,7 +108,7 @@ void IonoDelay::Earth2LevelRotation(){
     return ;
 }
 std::vector<double>
-IonoDelay::Matrix_vector_multiplication(const std::vector<std::vector<double>>& A, const std::vector<double>& B){
+UsTecIonoCorrComputer::Matrix_vector_multiplication(const std::vector<std::vector<double>>& A, const std::vector<double>& B){
     int row = A.size();
     int col = A[0].size();
   std::vector<double> C(row,0.0);
@@ -123,7 +123,7 @@ IonoDelay::Matrix_vector_multiplication(const std::vector<std::vector<double>>& 
 }
 
 std::vector<double>
-IonoDelay::ElevationAzimuthComputation(const std::vector<double>& sat_pos){
+UsTecIonoCorrComputer::ElevationAzimuthComputation(const std::vector<double>& sat_pos){
     // geodetic position in semi-circles
     //double phi_u = user_latitude/pi;
     //double lambda_u = user_longitude/pi;
@@ -140,7 +140,7 @@ IonoDelay::ElevationAzimuthComputation(const std::vector<double>& sat_pos){
     double azimuth = atan2(dr[1],dr[0]);
     return {elevation,azimuth} ;
 }
-std::vector<double> IonoDelay::PiercePointCalculation (const double& elevation, const double& azimuth){
+std::vector<double> UsTecIonoCorrComputer::PiercePointCalculation (const double& elevation, const double& azimuth){
     // Prol-2017
     double psi_r = pi/2 - elevation - asin(Earth_radius*cos(elevation)/(Earth_radius+iono_height));
     double temp = sin(user_latitude)*cos(psi_r)+cos(user_latitude)*sin(psi_r)*cos(azimuth);
@@ -150,7 +150,7 @@ std::vector<double> IonoDelay::PiercePointCalculation (const double& elevation, 
     double pierce_longitude = lambda_ip*180/pi;
     return {pierce_latitude,pierce_longitude};
 }
-int IonoDelay::VerticalTECComputation(const std::vector<double>& sat_pos){
+int UsTecIonoCorrComputer::VerticalTECComputation(const std::vector<double>& sat_pos){
     // variables for different users
     double pierce_latitude;
     double pierce_longitude;
@@ -250,18 +250,18 @@ int IonoDelay::VerticalTECComputation(const std::vector<double>& sat_pos){
 
     return 0;
 }
-double IonoDelay::SlantTECComputation (const double& V_TEC){
+double UsTecIonoCorrComputer::SlantTECComputation (const double& V_TEC){
     double mp_temp = Earth_radius*cos(elevation)/(Earth_radius+iono_height);
     double mp_fact = sqrt(1-pow(mp_temp,2));
     mp_fact = 1/mp_fact;
     return V_TEC*mp_fact;
 
 }
-double IonoDelay::TEC2IonoDelayComputation(const double &S_TEC, const double &frequency) {
+double UsTecIonoCorrComputer::TEC2IonoDelayComputation(const double &S_TEC, const double &frequency) {
     return (40.3/pow(frequency,2))*S_TEC*1e16;
 }
 
-void IonoDelay::GetLatLonHeight(double& lat, double& lon, double& h)
+void UsTecIonoCorrComputer::GetLatLonHeight(double& lat, double& lon, double& h)
 {
     lat = user_latitude;
     lon = user_longitude;
@@ -269,12 +269,12 @@ void IonoDelay::GetLatLonHeight(double& lat, double& lon, double& h)
     return ;
 }
 
-double IonoDelay::GetElevation()
+double UsTecIonoCorrComputer::GetElevation()
 {
     return elevation;
 }
 
-double IonoDelay::GetVTEC()
+double UsTecIonoCorrComputer::GetVTEC()
 {
     return vertical_TEC;
 }

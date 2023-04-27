@@ -1,7 +1,7 @@
 #pragma once
-#include "SatPosClkComp.h"
+#include "sat_pos_clk_computer.h"
 
-class geoid {
+class GeoidModelHelper {
 public:
     double geoidh(double geo_lat,double geo_lon);
     

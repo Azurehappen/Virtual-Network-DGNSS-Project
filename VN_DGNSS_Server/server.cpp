@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     sleep(2);
   }
   // Get empirical Trop model data
-  IGGexpModel TropData = getIGGtropData("../VN_DGNSS_src/IGGtropSHexpModel.ztd");
+  IggtropExperimentModel TropData = GetIggtropCorrDataFromFile("../vn_dgnss_source/IGGtropSHexpModel.ztd");
   // 5.wait and connect, pthread_create
   unsigned i;
   SockInfo client_info[MAX_NUM_OF_CLIENTS];  // maximum number of threads

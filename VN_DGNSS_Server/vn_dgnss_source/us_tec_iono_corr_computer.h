@@ -10,17 +10,17 @@
 #include <numeric>
 #define ELEVMASK 10*3.14159265358980/180
 
-class IonoDelay {
+class UsTecIonoCorrComputer {
 public:
     /*
      * constructor takes input of USTEC file path
      */
-  IonoDelay(std::vector<std::vector<int>>  USTEC_map_file, std::vector<double>  user_location);
+    UsTecIonoCorrComputer(std::vector<std::vector<int>>  USTEC_map_file, std::vector<double>  user_location);
 
     /*
      * Destroys IonoDelayComputation instance
      */
-    ~IonoDelay();
+    ~UsTecIonoCorrComputer();
 
     /*
      * Parses Ionospheric delay computation parameters

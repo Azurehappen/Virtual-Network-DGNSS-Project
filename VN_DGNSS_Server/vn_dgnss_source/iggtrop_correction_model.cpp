@@ -1,6 +1,6 @@
-#include "IGGtrop.h"
+#include "iggtrop_correction_model.h"
 
-int IGGtrop::fix(double val) {
+int IggtropCorrectionModel::fix(double val) {
   if (val>=0) {
     return floor(val);
   } else {
@@ -8,7 +8,7 @@ int IGGtrop::fix(double val) {
   }
 }
 
-IGGexpModel getIGGtropData(const std::string& file) {
+IggtropExperimentModel GetIggtropCorrDataFromFile(const std::string& file) {
   int nHPara = 6;
   int nPara = 5;
   double dlon = 2.5, dlat = 2.5;
@@ -20,7 +20,7 @@ IGGexpModel getIGGtropData(const std::string& file) {
     data.insert(data.end(),dataread.begin(),dataread.begin()+78840);
   }
   inFile.close();
-  IGGexpModel TropModel;
+  IggtropExperimentModel TropModel;
   TropModel.data.resize(nPara);
   for (int n1 = 0; n1 < nPara;n1++) {
     TropModel.data[n1].resize(nHPara);
@@ -42,7 +42,7 @@ IGGexpModel getIGGtropData(const std::string& file) {
   }
   return TropModel;
 }
-double IGGtrop::IGGtropdelay(
+double IggtropCorrectionModel::IGGtropdelay(
     double uLon, double uLat, double uH, int doy, double elev,
     const std::vector<std::vector<std::vector<std::vector<float>>>> &data) {
   int nHPara = 6;

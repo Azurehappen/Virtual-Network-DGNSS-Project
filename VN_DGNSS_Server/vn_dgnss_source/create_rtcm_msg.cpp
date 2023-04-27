@@ -1,20 +1,23 @@
-#include "data2rtcm.h"
+#include "create_rtcm_msg.h"
 
 #define NINCOBS 262144 /* inclimental number of obs data */
 
 /* test rtcm nav data --------------------------------------------------------*/
-static int is_nav(int type) {
+static bool IsNav(int type) {
   return type == 1019 || type == 1044 || type == 1045 || type == 1046;
 }
+
 /* test rtcm gnav data -------------------------------------------------------*/
-static int is_gnav(int type) { return type == 1020; }
+static bool IsGNav(int type) { return type == 1020; }
+
 /* test rtcm ant info --------------------------------------------------------*/
-static int is_ant(int type) {
+static bool IsAnt(int type) {
   return type == 1005 || type == 1006 || type == 1007 || type == 1008 ||
          type == 1033;
 }
+
 /* initialize station parameter ----------------------------------------------*/
-static void init_sta(sta_t *sta) {
+static void InitStationPara(sta_t *sta) {
   int i;
   *sta->name = '\0';
   *sta->marker = '\0';
@@ -28,18 +31,19 @@ static void init_sta(sta_t *sta) {
   for (i = 0; i < 3; i++) sta->del[i] = 0.0;
   sta->hgt = 0.0;
 }
+
 /* generate rtcm obs data messages -------------------------------------------*/
-static void gen_rtcm_obs(rtcm_t *rtcm, const int *type,
+static void GenerateRtcmObsMsg(rtcm_t *rtcm, const int *type,
                          int n, SockRTCM *client_info) {
   int i, j = 0;
   char client_ip[INET_ADDRSTRLEN];
   inet_ntop(AF_INET, &(client_info->addr.sin_addr), client_ip, INET_ADDRSTRLEN);
   for (i = 0; i < n; i++) {
-    if (is_nav(type[i]) || is_gnav(type[i]) || is_ant(type[i])) continue;
+    if (IsNav(type[i]) || IsGNav(type[i]) || IsAnt(type[i])) continue;
     j = i; /* index of last message */
   }
   for (i = 0; i < n; i++) {
-    if (is_nav(type[i]) || is_gnav(type[i]) || is_ant(type[i])) continue;
+    if (IsNav(type[i]) || IsGNav(type[i]) || IsAnt(type[i])) continue;
 
     if (!gen_rtcm3(rtcm, type[i], i != j)) continue;
     // if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
@@ -60,13 +64,13 @@ static void gen_rtcm_obs(rtcm_t *rtcm, const int *type,
   }
 }
 /* generate rtcm antenna info messages ---------------------------------------*/
-static void gen_rtcm_ant(rtcm_t *rtcm, const int *type,
+static void GenerateRtcmAntMsg(rtcm_t *rtcm, const int *type,
                          int n, SockRTCM *client_info) {
   int i;
   char client_ip[INET_ADDRSTRLEN];
   inet_ntop(AF_INET, &(client_info->addr.sin_addr), client_ip, INET_ADDRSTRLEN);
   for (i = 0; i < n; i++) {
-    if (!is_ant(type[i])) continue;
+    if (!IsAnt(type[i])) continue;
 
     if (!gen_rtcm3(rtcm, type[i], 0)) continue;
     // if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
@@ -86,16 +90,18 @@ static void gen_rtcm_ant(rtcm_t *rtcm, const int *type,
     }
   }
 }
+
 /* restore slips -------------------------------------------------------------*/
-static void restslips(unsigned char slips[][NFREQ], obsd_t *data) {
+static void ResetSlips(unsigned char slips[][NFREQ], obsd_t *data) {
   int i;
   for (i = 0; i < NFREQ; i++) {
     if (slips[data->sat - 1][i] & 1) data->LLI[i] |= LLI_SLIP;
     slips[data->sat - 1][i] = 0;
   }
 }
+
 /* add obs data --------------------------------------------------------------*/
-static int addobsdata(obs_t *obs, const obsd_t *data) {
+static int AddObservationData(obs_t *obs, const obsd_t *data) {
   obsd_t *obs_data;
 
   if (obs->nmax <= obs->n) {
@@ -105,7 +111,7 @@ static int addobsdata(obs_t *obs, const obsd_t *data) {
       obs->nmax *= 2;
     if (!(obs_data =
               (obsd_t *)realloc(obs->data, sizeof(obsd_t) * obs->nmax))) {
-      // trace(1,"addobsdata: memalloc error
+      // trace(1,"AddObservationData: memalloc error
       // n=%dx%d\n",sizeof(obsd_t),obs->nmax);
       free(obs->data);
       obs->data = nullptr;
@@ -117,8 +123,9 @@ static int addobsdata(obs_t *obs, const obsd_t *data) {
   obs->data[obs->n++] = *data;
   return 1;
 }
+
 /* convert to rtcm messages --------------------------------------------------*/
-static int conv_rtcm(const int *type, int n, SockRTCM *client_info,
+static int ConvertMeasToRtcm(const int *type, int n, SockRTCM *client_info,
                      const obs_t *obs, const nav_t *nav, const sta_t *sta,
                      int staid)  // vector<vector<gtime_t>> &lltime_rcd)
 {
@@ -150,7 +157,7 @@ static int conv_rtcm(const int *type, int n, SockRTCM *client_info,
     rtcm.nav.geph[prn - 1] = nav->geph[i];
   }
   /* gerate rtcm antenna info messages */
-  gen_rtcm_ant(&rtcm, type, n, client_info);
+  GenerateRtcmAntMsg(&rtcm, type, n, client_info);
 
   for (i = 0; i < obs->n; i = j) {
     /* extract epoch obs data */
@@ -165,7 +172,7 @@ static int conv_rtcm(const int *type, int n, SockRTCM *client_info,
     rtcm.obs.data = obs->data + i;
     rtcm.obs.n = j - i;
     /* generate rtcm obs data messages */
-    gen_rtcm_obs(&rtcm, type, n, client_info);
+    GenerateRtcmObsMsg(&rtcm, type, n, client_info);
     // fprintf(stderr,"NOBS=%2d\r",rtcm.obs.n);
   }
 
@@ -186,8 +193,9 @@ static int conv_rtcm(const int *type, int n, SockRTCM *client_info,
   free(rtcm.nav.geph);
   return 1;
 }
+
 /* main ----------------------------------------------------------------------*/
-int data2rtcm(int n, const int *type, int m, SockRTCM *client_info,
+int CreateRtcmMsg(int n, const int *type, int m, SockRTCM *client_info,
               std::vector<double> sta_pos, std::vector<obsd_t> data_obs) {
   int staid = 0; /*Station ID*/
   nav_t nav = {0};
@@ -229,11 +237,11 @@ int data2rtcm(int n, const int *type, int m, SockRTCM *client_info,
   /*Save data tp obs struct*/
   for (i = 0; i < n; i++) {
     /* save obs data */
-    if ((stat = addobsdata(&obs, data + i)) < 0) break;
+    if ((stat = AddObservationData(&obs, data + i)) < 0) break;
   }
   free(data);
   /* Generate "sta" */
-  init_sta(&sta);
+  InitStationPara(&sta);
   for (int j = 0; j < 3; j++) sta.pos[j] = sta_pos[j];
   sta.del[0] = 0;
   sta.del[1] = 0;
@@ -249,7 +257,7 @@ int data2rtcm(int n, const int *type, int m, SockRTCM *client_info,
   sortobs(&obs);
 
   /* convert to rtcm messages */
-  if (!conv_rtcm(type, m, client_info, &obs, &nav, &sta, staid)) ret = -1;
+  if (!ConvertMeasToRtcm(type, m, client_info, &obs, &nav, &sta, staid)) ret = -1;
 
   free(obs.data);
   freenav(&nav, 0xFF);
@@ -269,5 +277,5 @@ int data2rtcm(int n, const int *type, int m, SockRTCM *client_info,
 //    int type[16];
 //    int m = 2, staid = 0; /*Number of message type, Station ID*/
 //    type[0] = 1001; type[1]=1005; /* Define massage type */
-//    int ret = data2rtcm(date_time_gps,n,type,m,outfile,staid);
+//    int ret = CreateRtcmMsg(date_time_gps,n,type,m,outfile,staid);
 //}

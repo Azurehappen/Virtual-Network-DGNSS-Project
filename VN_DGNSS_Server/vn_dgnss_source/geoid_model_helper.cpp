@@ -1,4 +1,4 @@
-#include "geoid.h"
+#include "geoid_model_helper.h"
 using namespace std;
 
 /* geoid height ----------------------------------------------------------------
@@ -6,7 +6,7 @@ using namespace std;
 * args   : double *pos      I   geodetic position {lat,lon} (rad)
 * return : geoid height (m) (0.0:error)
 *-----------------------------------------------------------------------------*/
-double geoid::geoidh(double geo_lat,double geo_lon)
+double GeoidModelHelper::geoidh(double geo_lat,double geo_lon)
 {
     double posd[2];
     const double dlon=1.0,dlat=1.0;
@@ -25,7 +25,7 @@ double geoid::geoidh(double geo_lat,double geo_lon)
 }
 
 /* bilinear interpolation ----------------------------------------------------*/
-double geoid::interpb(double *y, double a, double b)
+double GeoidModelHelper::interpb(double *y, double a, double b)
 {
     return y[0]*(1.0-a)*(1.0-b)+y[1]*a*(1.0-b)+y[2]*(1.0-a)*b+y[3]*a*b;
 }
@@ -34,8 +34,8 @@ double geoid::interpb(double *y, double a, double b)
 * embedded geoid model
 * notes  : geoid heights are derived from EGM96 (1 x 1 deg grid)
 *-----------------------------------------------------------------------------*/
-const double geoid::range[]={0.00,360.00,-90.00,90.00};
-const float geoid::geoidval[361][181]={{
+const double GeoidModelHelper::range[]={0.00,360.00,-90.00,90.00};
+const float GeoidModelHelper::geoidval[361][181]={{
 -29.534f,-27.880f,-24.897f,-21.973f,-18.154f,-15.493f,-14.636f,-12.657f,-10.648f, -9.301f,
 -7.084f, -4.850f, -2.015f,  1.642f,  5.903f,  9.258f, 10.905f, 13.100f, 12.465f, 13.448f,
 14.464f, 10.528f, 10.660f, 10.931f, 12.894f, 13.775f, 13.406f, 13.503f, 13.701f, 14.329f,

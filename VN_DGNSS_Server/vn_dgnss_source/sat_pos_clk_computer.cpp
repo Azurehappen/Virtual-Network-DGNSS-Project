@@ -1,4 +1,4 @@
-#include "SatPosClkComp.h"
+#include "sat_pos_clk_computer.h"
 #include <utility>
 
 // earth gravitational constant
@@ -49,7 +49,7 @@ static double F_define(int sys) {
   }
 }
 
-SatPosClkComp::SatPosClkComp(gtime_t rcv_t, std::vector<double> dX, std::vector<double> dV,
+SatPosClkComputer::SatPosClkComputer(gtime_t rcv_t, std::vector<double> dX, std::vector<double> dV,
                              gtime_t orb_corr_time, std::vector<double> dt_corr,
                              gtime_t clk_corr_time, satstruct::Ephemeris eph_data_0, int sys)
     : received_time(rcv_t),
@@ -71,9 +71,9 @@ SatPosClkComp::SatPosClkComp(gtime_t rcv_t, std::vector<double> dX, std::vector<
       sat_pos_pre_trans(3, 0),
       sys(sys) {}
 
-SatPosClkComp::~SatPosClkComp() = default;
+SatPosClkComputer::~SatPosClkComputer() = default;
 
-double SatPosClkComp::limit_gpstime(double time_gps) {
+double SatPosClkComputer::limit_gpstime(double time_gps) {
   if (time_gps > 302400) {
     time_gps -= 604800;
   } else if (time_gps < -302400) {
@@ -81,7 +81,7 @@ double SatPosClkComp::limit_gpstime(double time_gps) {
   }
   return time_gps;
 }
-void SatPosClkComp::SatClkComputation() {
+void SatPosClkComputer::SatClkComputation() {
   // transmit time with handover limited
   double t = timediff( transmit_time , eph_0.t_oc);
   // clock bias
@@ -93,12 +93,12 @@ void SatPosClkComp::SatClkComputation() {
   double L2 = CLIGHT / lambda_L2;
   dt_g2 = -(pow(L1 / L2, 2)) * eph_0.T_GD;
 }
-void SatPosClkComp::PreciseSatClkComputation() {
+void SatPosClkComputer::PreciseSatClkComputation() {
   double dt_p = timediff(transmit_time , ssr_clock_time);
   dt_clk_precise =
           (dt_corr[0] + dt_corr[1] * dt_p + dt_corr[2] * pow(dt_p, 2)) / CLIGHT;
 }
-double SatPosClkComp::KeplerAnomaly(double ecc, double M_k) {
+double SatPosClkComputer::KeplerAnomaly(double ecc, double M_k) {
   // set tolerance
   double tol = 1e-13;
   size_t max_iter = 25;
@@ -112,7 +112,7 @@ double SatPosClkComp::KeplerAnomaly(double ecc, double M_k) {
   return Ek;
 }
 
-void SatPosClkComp::SatEphPosComputation() {
+void SatPosClkComputer::SatEphPosComputation() {
   // semi-major axis (m)
   A = eph_0.sqrtA * eph_0.sqrtA;
 
@@ -196,7 +196,7 @@ void SatPosClkComp::SatEphPosComputation() {
 
 }
 
-void SatPosClkComp::SatEphVelComputation() {
+void SatPosClkComputer::SatEphVelComputation() {
   double E_k_dot = n / (1 - eph_0.e * cEk);
 
   double Phi_k_dot =
@@ -227,7 +227,7 @@ void SatPosClkComp::SatEphVelComputation() {
   sat_vel_ecef[2] = z_k_dot;
 }
 
-void SatPosClkComp::SatEphVelComputationUpdated() {
+void SatPosClkComputer::SatEphVelComputationUpdated() {
   double Mdot_k = n;
   double Edot_k = Mdot_k / (1 - eph_0.e * cEk);
 
@@ -260,7 +260,7 @@ void SatPosClkComp::SatEphVelComputationUpdated() {
   sat_vel_ecef[1] = ydot_k;
   sat_vel_ecef[2] = zdot_k;
 }
-std::vector<double> SatPosClkComp::RAC2ECEF(std::vector<double> dp_RAC,
+std::vector<double> SatPosClkComputer::RAC2ECEF(std::vector<double> dp_RAC,
                                             std::vector<double> p_ecef,
                                             std::vector<double> v_ecef) {
   std::vector<double> unit_a(3, 0);
@@ -301,7 +301,7 @@ std::vector<double> SatPosClkComp::RAC2ECEF(std::vector<double> dp_RAC,
   }
   return ECEF_delta_vector;
 }
-void SatPosClkComp::PreciseSatPosComputation() {
+void SatPosClkComputer::PreciseSatPosComputation() {
   double dt = timediff(transmit_time , ssr_orbit_time);
 
   std::vector<double> dX_rac_n(3, 0);
@@ -316,7 +316,7 @@ void SatPosClkComp::PreciseSatPosComputation() {
 
 }
 
-void SatPosClkComp::EarthRotationCorrection(std::vector<double> &x_pos) const {
+void SatPosClkComputer::EarthRotationCorrection(std::vector<double> &x_pos) const {
   double theta = OMGE * propagation_time;
   double dx1 = cos(theta) * x_pos[0] + sin(theta) * x_pos[1];
   double dx2 = -sin(theta) * x_pos[0] + cos(theta) * x_pos[1];
@@ -324,14 +324,14 @@ void SatPosClkComp::EarthRotationCorrection(std::vector<double> &x_pos) const {
   x_pos[1] = dx2;
 }
 
-double SatPosClkComp::Sagnac(std::vector<double> user_pos) {
+double SatPosClkComputer::Sagnac(std::vector<double> user_pos) {
   return OmegaDot_e *
          (sat_pos_ecef_precise[0] * user_pos[1] -
           sat_pos_ecef_precise[1] * user_pos[0]) /
          CLIGHT;
 }
 
-void SatPosClkComp::PropTimeOptm(std::vector<double> user_pos) {
+void SatPosClkComputer::PropTimeOptm(std::vector<double> user_pos) {
   double tp_comp = 2.5 * pow(10, 7) / CLIGHT;
   // cout<<tp_comp<<endl;
   double h, dh_dt, tp_old;
@@ -378,22 +378,22 @@ void SatPosClkComp::PropTimeOptm(std::vector<double> user_pos) {
   propagation_time = tp_comp + dt_clk;
 }
 
-void SatPosClkComp::ComputePreciseOrbitClockCorrection() {
+void SatPosClkComputer::ComputePreciseOrbitClockCorrection() {
   // rotation correction for satellite position
   EarthRotationCorrection(sat_pos_ecef);
   // rotation correction for precise satellite position
   EarthRotationCorrection(sat_pos_ecef_precise);
 }
 
-std::vector<double> SatPosClkComp::GetSatPos() { return sat_pos_ecef; }
+std::vector<double> SatPosClkComputer::GetSatPos() { return sat_pos_ecef; }
 
-std::vector<double> SatPosClkComp::GetPreciseSatPos() {
+std::vector<double> SatPosClkComputer::GetPreciseSatPos() {
   return sat_pos_ecef_precise;
 }
-std::vector<double> SatPosClkComp::GetPreSatPosAtTranst() {
+std::vector<double> SatPosClkComputer::GetPreSatPosAtTranst() {
   return sat_pos_pre_trans;
 }
-double SatPosClkComp::GetClock() {
+double SatPosClkComputer::GetClock() {
   return dt_clk  * CLIGHT;
 }
 

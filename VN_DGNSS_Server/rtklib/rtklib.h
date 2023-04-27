@@ -811,7 +811,7 @@ EXPORT int model_phw(gtime_t time, int opt,
 EXPORT void free_rtcm  (rtcm_t *rtcm);
 EXPORT int gen_rtcm3   (rtcm_t *rtcm, int type, int sync);
 
-//EXPORT int data2rtcm(double *date_time_gps,int n,const int *type,int m,
+//EXPORT int CreateRtcmMsg(double *date_time_gps,int n,const int *type,int m,
 //        int fd, vector<double> sta_pos,vector<unsigned char> prn_recd,
 //        vector<double> rtcm_pseR_L1,vector<double> rtcm_carrier_L1,
 //        vector<double> rtcm_pseR_L2,vector<double> rtcm_carrier_L2,

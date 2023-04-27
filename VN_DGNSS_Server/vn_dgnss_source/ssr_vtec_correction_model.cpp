@@ -1,4 +1,4 @@
-#include "SSR_VTEC.h"
+#include "ssr_vtec_correction_model.h"
 #define min(x,y)    ((x)<(y)?(x):(y))
 
 double factorial(int n) {
@@ -21,11 +21,11 @@ double associatedLegendreFunction(int n, int m, double t) {
   return sum *= fac;
 }
 // Constructor
-SSR_VTEC::SSR_VTEC() {
+SsrVtecCorrectionModel::SsrVtecCorrectionModel() {
   _psiPP = _phiPP = _lambdaPP = _lonS = 0.0;
 }
 
-void SSR_VTEC::xyz2neu(double* Ell, const double* xyz, double* neu) {
+void SsrVtecCorrectionModel::xyz2neu(double* Ell, const double* xyz, double* neu) {
 
   double sinPhi = sin(Ell[0]);
   double cosPhi = cos(Ell[0]);
@@ -43,7 +43,7 @@ void SSR_VTEC::xyz2neu(double* Ell, const double* xyz, double* neu) {
            + cosPhi*sinLam * xyz[1]
            + sinPhi        * xyz[2];
 }
-void SSR_VTEC::satazel(const double *r_ecef,const double *sat, double *azel) {
+void SsrVtecCorrectionModel::satazel(const double *r_ecef,const double *sat, double *azel) {
   double rhoV[3];
   for (int i=0;i<3;i++) {
     rhoV[i] = sat[i] - r_ecef[i];
@@ -62,7 +62,7 @@ void SSR_VTEC::satazel(const double *r_ecef,const double *sat, double *azel) {
   azel[1] = sphEle;
 }
 
-void SSR_VTEC::piercePoint(double layerHeight, double epoch, const double* geocSta,
+void SsrVtecCorrectionModel::piercePoint(double layerHeight, double epoch, const double* geocSta,
             double r, const double *azel) {
 
   double sphEle = azel[1];
@@ -83,7 +83,7 @@ void SSR_VTEC::piercePoint(double layerHeight, double epoch, const double* geocS
   _lonS = fmod((_lambdaPP + (epoch - 50400) * M_PI / 43200), 2*M_PI);
 }
 
-double SSR_VTEC::vtecSingleLayerContribution(const VTecCorrection& tec) const {
+double SsrVtecCorrectionModel::vtecSingleLayerContribution(const VTecCorrection& tec) const {
 
   double vtec = 0.0;
   int N = tec.nDeg;
@@ -115,7 +115,7 @@ double SSR_VTEC::vtecSingleLayerContribution(const VTecCorrection& tec) const {
   return vtec;
 }
 
-double SSR_VTEC::stec(const VTecCorrection& tec, double gpst_sec, const std::vector<double>& r_ecef,
+double SsrVtecCorrectionModel::stec(const VTecCorrection& tec, double gpst_sec, const std::vector<double>& r_ecef,
                       const std::vector<double>& xyzSat, double sys_F1) {
 
   // Latitude, longitude, height are defined with respect to a spherical earth model
@@ -137,4 +137,4 @@ double SSR_VTEC::stec(const VTecCorrection& tec, double gpst_sec, const std::vec
   stec += vtec / sin(azel[1] + _psiPP);
   return stec*40.3e16/sys_F1/sys_F1;
 }
-SSR_VTEC::~SSR_VTEC() = default;
+SsrVtecCorrectionModel::~SsrVtecCorrectionModel() = default;

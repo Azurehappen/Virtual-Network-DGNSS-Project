@@ -1,13 +1,14 @@
-project(VN_DGNSS_src)
+project(vn_dgnss_source)
 
 cmake_minimum_required(VERSION 3.9)
 
 set(COMPILE_FLAGS "-Wall -Werror -Wpedantic -O3 -pthread")
 set(CMAKE_CXX_STANDARD 17)
-set(SOURCE_FILES IonoDelay.cpp SatPosClkComp.cpp
-        geoid.cpp datagent.cpp data2rtcm.cpp SSR_VTEC.cpp)
-set(HEADER_FILES IonoDelay.h SatPosClkComp.h
-        geoid.h datagent.h data2rtcm.h SSR_VTEC.h IGGtrop.cpp IGGtrop.h)
+set(SOURCE_FILES us_tec_iono_corr_computer.cpp sat_pos_clk_computer.cpp
+        geoid_model_helper.cpp epoch_generation_helper.cpp create_rtcm_msg.cpp ssr_vtec_correction_model.cpp)
+set(HEADER_FILES us_tec_iono_corr_computer.h sat_pos_clk_computer.h
+        geoid_model_helper.h epoch_generation_helper.h create_rtcm_msg.h
+        ssr_vtec_correction_model.h iggtrop_correction_model.cpp iggtrop_correction_model.h)
 
 find_package(Threads REQUIRED)
 

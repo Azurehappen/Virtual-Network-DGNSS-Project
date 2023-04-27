@@ -5,8 +5,8 @@
 #include <cstdlib>
 #include <sys/time.h>
 #include <iomanip>
-#include "datagent.h"
-#include "IGGtrop.h"
+#include "epoch_generation_helper.h"
+#include "iggtrop_correction_model.h"
 
 #define SEND_PERIOD 1000000  // Period of server send RTCM: 1s
 #define MAX_NUM_OF_CLIENTS 128    // Max no. of clients
@@ -20,12 +20,12 @@ typedef struct SockInfo {
   BkgDataRequestor *foo_bkg{};
   WebDataRequestor *foo_web{};
   timeperiodic::PeriodicInfoT periodic{};
-  IGGexpModel TropData;
+  IggtropExperimentModel TropData;
 } SockInfo;
 
 bool parse_position(std::string const &message,
                     std::vector<double> &position,
-                    sys_infor &infor)
+                    GnssSystemInfo &infor)
 // Parse a position message into a position vector. Returns true if
 // parsing is successful. An example position message:
 // $POSECEF 1564964.4988 4889464.1566 156489.65464 01 01 01 \r\n
@@ -62,7 +62,7 @@ bool parse_position(std::string const &message,
 
 bool init_read_pos_client(SockInfo *client_info,
                           std::vector<double> &client_pos_ecef,
-                          sys_infor &infor, char *client_ip) {
+                          GnssSystemInfo &infor, char *client_ip) {
   // Read position from client
   int count = 0;
   char buff[BUFF_SIZE] = {0};
@@ -138,7 +138,7 @@ void *pth_handler(void *arg) {
       << std::endl;
   std::vector<double> client_pos_ecef(3, 0);
   // Read position for client
-  sys_infor infor;
+  GnssSystemInfo infor;
   infor.sys.resize(3,true);
   if (!init_read_pos_client(client_info, client_pos_ecef, infor, client_ip)) {
 //    close(client_info->client_sock.fd);
@@ -181,14 +181,14 @@ void *pth_handler(void *arg) {
     if (iter%60 == 1) { // record log by every 1 minute
       rst << "Running idx: " << iter << std::endl;
     }
-    datagent genRTCM(client_pos_ecef);
-    client_info->client_sock.send_check = true; // If send error, false in sendRTCM
+    EpochGenerationHelper genRTCM(client_pos_ecef);
+    client_info->client_sock.send_check = true; // If send error, false in SendRtcmMsgToClient
     srtt = vntimefunc::GetSystemTimeInSec();
-    if (genRTCM.computemeasrements(client_info->foo_bkg,
-                                   client_info->foo_web, rst,
-                                   infor, client_info->TropData,
-                                   phw_gps_track,iter)) {
-      genRTCM.sendRTCM(&client_info->client_sock);
+    if (genRTCM.ConstructGnssMeas(client_info->foo_bkg,
+                                  client_info->foo_web, rst,
+                                  infor, client_info->TropData,
+                                  phw_gps_track, iter)) {
+      genRTCM.SendRtcmMsgToClient(&client_info->client_sock);
     }
     endt = vntimefunc::GetSystemTimeInSec();
     if (client_info->client_sock.send_check){

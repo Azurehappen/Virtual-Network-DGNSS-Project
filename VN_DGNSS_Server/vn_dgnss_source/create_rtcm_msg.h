@@ -7,12 +7,11 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
-#include <math.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <vector>
 
-// define Sock for data2rtcm struct
+// define Sock for CreateRtcmMsg struct
 struct SockRTCM{
   int fd;
   struct sockaddr_in addr;
@@ -21,6 +20,7 @@ struct SockRTCM{
   std::ostream *rtcm_log;
 };
 
-int data2rtcm(int n, const int *type, int m, SockRTCM *client_info,
+// Create RTCM message (modified function from RTKLIB)
+int CreateRtcmMsg(int n, const int *type, int m, SockRTCM *client_info,
               std::vector<double> sta_pos, std::vector<obsd_t> data_obs);
 

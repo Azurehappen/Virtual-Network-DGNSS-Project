@@ -6,13 +6,13 @@
 #include <iostream>
 #include <vector>
 
-class SatPosClkComp {
+class SatPosClkComputer {
 public:
   // instance of the structure
     satstruct::Ephemeris eph_0;
 
   // Constructor for ephemeris usage class
-  SatPosClkComp(gtime_t rcv_t, std::vector<double> dX, std::vector<double> dV,
+    SatPosClkComputer(gtime_t rcv_t, std::vector<double> dX, std::vector<double> dV,
                 gtime_t  orb_corr_time, std::vector<double> dt_corr,
                 gtime_t  clk_corr_time, satstruct::Ephemeris eph_data_0, int sys);
 
@@ -66,7 +66,7 @@ public:
   // get sat clock bias
   double GetClock();   // clock corr
 
-  ~SatPosClkComp();
+  ~SatPosClkComputer();
   //{eph_0.clear();}
 private:
   int sys;

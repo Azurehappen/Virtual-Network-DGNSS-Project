@@ -3,10 +3,10 @@
 #define WADGNSS_SERVER_SSR_VTEC_H
 #include "bkg_data_requestor.h"
 #include "rtklib.h"
-class SSR_VTEC {
+class SsrVtecCorrectionModel {
 public:
-  SSR_VTEC();
-  ~SSR_VTEC();
+    SsrVtecCorrectionModel();
+  ~SsrVtecCorrectionModel();
   double stec(const VTecCorrection& tec, double gpst_sec, const std::vector<double>& r_ecef,
               const std::vector<double>& xyzSat, double sys_F1);
 
