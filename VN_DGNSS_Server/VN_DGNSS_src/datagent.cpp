@@ -86,8 +86,8 @@ datagent::datagent(std::vector<double> pos_ecef)
 datagent::~datagent() = default;
 
 void datagent::getgpstnow() {
-  get_gpst_now(date_gps, doy,
-               gpst_now); // get current GPS time and days of year
+  vntimefunc::GetGpsTimeNow(date_gps, doy,
+                gpst_now); // get current GPS time and days of year
 }
 
 void datagent::getcorrdata(BkgDataRequestor *foo_bkg, WebDataRequestor *foo_web,

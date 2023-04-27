@@ -184,14 +184,15 @@ int BkgDataRequestor::RequestSsrData() {
   int IGS_ret = recv(ssr_fd, IGS_buf, sizeof(IGS_buf), MSG_DONTWAIT);
   if (IGS_ret == -1) {
     if (!(errno == EWOULDBLOCK || errno == EAGAIN || errno == EINTR)) {
-      log_ssr << get_time() << "IGS port unexpected error: " << strerror(errno)
-              << std::endl;
+      log_ssr << vntimefunc::GetLocalTimeString()
+              << "IGS port unexpected error: " << strerror(errno) << std::endl;
       return -1;
     } else {
       return 0;
     }
   } else if (IGS_ret == 0) {
-    log_ssr << get_time() << "BKG has closed IGS port connection." << std::endl;
+    log_ssr << vntimefunc::GetLocalTimeString()
+            << "BKG has closed IGS port connection." << std::endl;
     return -1;
   } else if (IGS_ret > 0) {
     // Initialize data struct for SSR
@@ -616,14 +617,15 @@ int BkgDataRequestor::RequestEphData() {
   int eph_ret = recv(eph_fd, eph_buf, sizeof(eph_buf), MSG_DONTWAIT);
   if (eph_ret == -1) {
     if (!(errno == EWOULDBLOCK || errno == EAGAIN || errno == EINTR)) {
-      log_eph << get_time() << "EPH port unexpected error: " << strerror(errno)
-              << std::endl;
+      log_eph << vntimefunc::GetLocalTimeString()
+              << "EPH port unexpected error: " << strerror(errno) << std::endl;
       return -1;
     } else {
       return -2;
     }
   } else if (eph_ret == 0) {
-    log_eph << get_time() << "BKG has closed EPH port connection." << std::endl;
+    log_eph << vntimefunc::GetLocalTimeString()
+            << "BKG has closed EPH port connection." << std::endl;
     return -1;
   } else if (eph_ret > 0) {
     std::stringstream eph_ss(eph_buf), ss;
@@ -714,8 +716,8 @@ int BkgDataRequestor::RequestEphData() {
       }
     }
     if (num_sv > 0) {
-      log_eph << get_time() << "recv sv prn: " << sv_rcrd << "data"
-              << std::endl;
+      log_eph << vntimefunc::GetLocalTimeString() << "recv sv prn: " << sv_rcrd
+              << "data" << std::endl;
     }
     return num_sv;
   }
@@ -750,7 +752,7 @@ bool BkgDataRequestor::BkgSocketClient(int port, const char *ip, int &fd) {
 
 // Output IGS data to log file
 void BkgDataRequestor::WriteSsrToLog() {
-  log_ssr << get_time() << "Current clock data" << '\n';
+  log_ssr << vntimefunc::GetLocalTimeString() << "Current clock data" << '\n';
   SatClockCorrEpoch clk_gps = clk_data[0].GPS;
   log_ssr << "GPS: " << clk_gps.datetime[0] << "-" << clk_gps.datetime[1] << "-"
           << clk_gps.datetime[2] << " " << clk_gps.datetime[3] << ":"
@@ -794,7 +796,7 @@ void BkgDataRequestor::WriteSsrToLog() {
     }
   }
 
-  log_ssr << get_time() << "Current orbit data" << '\n';
+  log_ssr << vntimefunc::GetLocalTimeString() << "Current orbit data" << '\n';
   SatOrbitCorrEpoch obt_gps = obt_data[0].GPS;
   log_ssr << "GPS: " << obt_gps.datetime[0] << "-" << obt_gps.datetime[1] << "-"
           << obt_gps.datetime[2] << " " << obt_gps.datetime[3] << ":"
@@ -871,19 +873,20 @@ void BkgDataRequestor::RequestEph() {
   timeval tv{};
   uint64_t file_t;
   gettimeofday(&tv, &tz);
-  file_t = get_sec(tv);
+  file_t = vntimefunc::GetSecFromTimeval(tv);
   eph_ready = true;
-  periodic_info_t eph_prd{};
-  make_periodic(kPortCheckPeriod, eph_prd);
+  timeperiodic::PeriodicInfoT eph_prd{};
+  timeperiodic::MakePeriodic(kPortCheckPeriod, eph_prd);
   while (!eph_done) {
     gettimeofday(&tv, &tz);
-    uint64_t now = get_sec(tv);
+    uint64_t now = vntimefunc::GetSecFromTimeval(tv);
     // update log file
     if (now / kFilePeriod != file_t / kFilePeriod) {
       log_eph.close();
       eph_log_path[2] = eph_log_path[1];
       eph_log_path[1] = eph_log_path[0];
-      eph_log_path[0] = file_path_ + "requestor_EPH_" + get_time_log() + ".log";
+      eph_log_path[0] = file_path_ + "requestor_EPH_" +
+                        vntimefunc::GetLocalTimeStringForLog() + ".log";
       log_eph.open(eph_log_path[0].c_str());
       if (!log_eph.is_open()) {
         fprintf(stderr, "requestor new EPH log file cannot be opened\n");
@@ -904,7 +907,7 @@ void BkgDataRequestor::RequestEph() {
       }
       usleep(kRequestInterval);
     }
-    wait_period(&eph_prd);
+    timeperiodic::WaitPeriod(&eph_prd);
   }
 }
 
@@ -932,13 +935,13 @@ void BkgDataRequestor::RequestSsr() {
   uint64_t log_t, file_t;
   gettimeofday(&tv, &tz);
   WriteSsrToLog();
-  log_t = file_t = get_sec(tv);
+  log_t = file_t = vntimefunc::GetSecFromTimeval(tv);
   ssr_ready = true;
-  periodic_info_t ssr_prd{};
-  make_periodic(kPortCheckPeriod, ssr_prd);
+  timeperiodic::PeriodicInfoT ssr_prd{};
+  timeperiodic::MakePeriodic(kPortCheckPeriod, ssr_prd);
   while (!ssr_done) {
     gettimeofday(&tv, &tz);
-    uint64_t now = get_sec(tv);
+    uint64_t now = vntimefunc::GetSecFromTimeval(tv);
     // Request USTEC data begin at HH:MM, HH:05 HH:20 HH:35 HH:50.
     if (now / kSsrlogPeriod != log_t / kSsrlogPeriod) {
       WriteSsrToLog();
@@ -949,7 +952,8 @@ void BkgDataRequestor::RequestSsr() {
       log_ssr.close();
       ssr_log_path[2] = ssr_log_path[1];
       ssr_log_path[1] = ssr_log_path[0];
-      ssr_log_path[0] = file_path_ + "requestor_SSR_" + get_time_log() + ".log";
+      ssr_log_path[0] = file_path_ + "requestor_SSR_" +
+                        vntimefunc::GetLocalTimeStringForLog() + ".log";
       log_ssr.open(ssr_log_path[0].c_str());
       if (!log_ssr.is_open()) {
         fprintf(stderr, "requestor new SSR log file cannot be opened\n");
@@ -974,7 +978,7 @@ void BkgDataRequestor::RequestSsr() {
       }
       usleep(kRequestInterval);
     }
-    wait_period(&ssr_prd);
+    timeperiodic::WaitPeriod(&ssr_prd);
   }
 }
 
@@ -1024,8 +1028,10 @@ void BkgDataRequestor::StartRequestor() {
   ssr_done = false;
   eph_ready = false;
   ssr_ready = false;
-  eph_log_path[0] = file_path_ + "requestor_EPH_" + get_time_log() + ".log";
-  ssr_log_path[0] = file_path_ + "requestor_SSR_" + get_time_log() + ".log";
+  eph_log_path[0] = file_path_ + "requestor_EPH_" +
+                    vntimefunc::GetLocalTimeStringForLog() + ".log";
+  ssr_log_path[0] = file_path_ + "requestor_SSR_" +
+                    vntimefunc::GetLocalTimeStringForLog() + ".log";
   log_eph.open(eph_log_path[0].c_str());
   log_ssr.open(ssr_log_path[0].c_str());
   if (!(log_eph.is_open() && log_ssr.is_open())) {

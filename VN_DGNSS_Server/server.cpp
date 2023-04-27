@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   // 1.create a socket
   int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (socket_fd == -1) {
-    std::cerr << get_time() << "err: create socket fail! caused by "
+    std::cerr << vntimefunc::GetLocalTimeString() << "err: create socket fail! caused by "
               << strerror(errno) << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   int bReuse = 1;
   if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &bReuse,
                  sizeof(bReuse)) == -1) {
-    std::cerr << get_time() << "err: set socket REUSE fail! caused by "
+    std::cerr << vntimefunc::GetLocalTimeString() << "err: set socket REUSE fail! caused by "
               << strerror(errno) << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   int ON = 1;
   if (setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, (void *)&ON,
                  sizeof(ON)) == -1) {
-    std::cerr << get_time() << "err: set socket TCP_NODELAY fail! caused by "
+    std::cerr << vntimefunc::GetLocalTimeString() << "err: set socket TCP_NODELAY fail! caused by "
               << strerror(errno) << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -48,22 +48,22 @@ int main(int argc, char *argv[]) {
   int bind_ret =
       bind(socket_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
   if (bind_ret < 0) {
-    std::cerr << get_time() << "err: bind fail! caused by " << strerror(errno)
+    std::cerr << vntimefunc::GetLocalTimeString() << "err: bind fail! caused by " << strerror(errno)
               << std::endl;
     exit(EXIT_FAILURE);
   }
 
   // 3.listen
-  int listen_ret = listen(socket_fd, MAXNO_CLients);
+  int listen_ret = listen(socket_fd, MAX_NUM_OF_CLIENTS);
   if (listen_ret == -1) {
-    std::cerr << get_time() << "err: listen fail! caused by " << strerror(errno)
+    std::cerr << vntimefunc::GetLocalTimeString() << "err: listen fail! caused by " << strerror(errno)
               << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  serverlog << get_time() << "The server started..." << std::endl;
-  serverlog << get_time() << "Listen on port: " << port_nu << std::endl;
-  serverlog << get_time() << "Waiting for client..." << std::endl;
+  serverlog << vntimefunc::GetLocalTimeString() << "The server started..." << std::endl;
+  serverlog << vntimefunc::GetLocalTimeString() << "Listen on port: " << port_nu << std::endl;
+  serverlog << vntimefunc::GetLocalTimeString() << "Waiting for client..." << std::endl;
 
   // 4.Start requestor
   BkgDataRequestor *foo_bkg;
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
   IGGexpModel TropData = getIGGtropData("../VN_DGNSS_src/IGGtropSHexpModel.ztd");
   // 5.wait and connect, pthread_create
   unsigned i;
-  SockInfo client_info[MAXNO_CLients];  // maximum number of threads
+  SockInfo client_info[MAX_NUM_OF_CLIENTS];  // maximum number of threads
   // set fd=-1
   for (i = 0; i < sizeof(client_info) / sizeof(client_info[0]); ++i) {
     client_info[i].client_sock.fd = -1;
@@ -90,15 +90,15 @@ int main(int argc, char *argv[]) {
   std::ofstream rtcmlog;
   rtcmlog.open("../../../Log/rtcm_log.txt");
   while (true) {
-    for (i = 0; i < sizeof(client_info) / sizeof(client_info[0]); ++i) {
+    for (i = 0; i < MAX_NUM_OF_CLIENTS; i++) {
       if (client_info[i].client_sock.fd == -1) break;
     }
-    if (i == MAXNO_CLients) {
+    if (i >= MAX_NUM_OF_CLIENTS - 1) {
       // Searching available site when clients reach maximum
       bool wait = true;
       while (wait) {
         sleep(1);
-        for (int k = 0; k < sizeof(client_info) / sizeof(client_info[0]); ++k) {
+        for (int k = 0; k < MAX_NUM_OF_CLIENTS; k++) {
           if (client_info[k].client_sock.fd == -1) {
             i = k;
             wait = false;
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
       char client_ip[INET_ADDRSTRLEN];
       inet_ntop(AF_INET, &(client_info[i].client_sock.addr.sin_addr), client_ip,
                 INET_ADDRSTRLEN);
-      serverlog << get_time() << "Failure accepting Client IP: " << client_ip
+      serverlog << vntimefunc::GetLocalTimeString() << "Failure accepting Client IP: " << client_ip
                 << " Port: " << ntohs(client_info[i].client_sock.addr.sin_port)
                 << " caused by " << strerror(errno) << std::endl;
       close(client_info[i].client_sock.fd);
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
     client_info[i].client_sock.rtcm_log = &rtcmlog;
     client_info[i].TropData = TropData;
     // Make Periodic for the client
-    make_periodic(SEND_PERIOD, client_info[i].periodic);
+    timeperiodic::MakePeriodic(SEND_PERIOD, client_info[i].periodic);
     // create pthread to transfer
     pthread_create(&client_info[i].tid, nullptr, pth_handler, &client_info[i]);
     // detach a thread

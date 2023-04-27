@@ -45,14 +45,14 @@ static void gen_rtcm_obs(rtcm_t *rtcm, const int *type,
     // if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
     int ret = send(client_info->fd, rtcm->buff, rtcm->nbyte, MSG_NOSIGNAL);
     if (ret == -1){
-      *client_info->log << get_time() <<"Client IP: "<< client_ip
+      *client_info->log << vntimefunc::GetLocalTimeString() <<"Client IP: "<< client_ip
                         << ", Port: "<< ntohs(client_info->addr.sin_port)
                         << " send error: " << strerror(errno)
                         << std::endl;
       client_info->send_check = false;
     }
     else if(ret == 0){
-      *client_info->log << get_time() <<"client IP: "<< client_ip
+      *client_info->log << vntimefunc::GetLocalTimeString() <<"client IP: "<< client_ip
                         << ", Port: "<< ntohs(client_info->addr.sin_port)
                         << " disconnected when sending data " << strerror(errno)
                         << std::endl;
@@ -72,14 +72,14 @@ static void gen_rtcm_ant(rtcm_t *rtcm, const int *type,
     // if (fwrite(rtcm->buff,rtcm->nbyte,1,fp)<1) break;
     int ret = send(client_info->fd, rtcm->buff, rtcm->nbyte, MSG_NOSIGNAL);
     if (ret == -1){
-      *client_info->log << get_time() <<"client IP: "<< client_ip
+      *client_info->log << vntimefunc::GetLocalTimeString() <<"client IP: "<< client_ip
                         << ", Port: "<< ntohs(client_info->addr.sin_port)
                         << " send error: " << strerror(errno)
                         << std::endl;
       client_info->send_check = false;
     }
     else if(ret == 0){
-      *client_info->log << get_time() <<"client IP: "<< client_ip
+      *client_info->log << vntimefunc::GetLocalTimeString() <<"client IP: "<< client_ip
                         << ", Port: "<< ntohs(client_info->addr.sin_port)
                         << " disconnected when sending data " << strerror(errno)
                         << std::endl;

@@ -3,9 +3,9 @@
 
 // Write function for curl
 size_t WebDataRequestor::WriteToBuffer(void *ptr, size_t size, size_t nmemb,
-                                      void *userdata) {
+                                       void *userdata) {
   size_t n = size * nmemb;
-  ((std::string *) userdata)->append((char *) ptr, n);
+  ((std::string *)userdata)->append((char *)ptr, n);
   return n;
 }
 
@@ -42,7 +42,7 @@ bool WebDataRequestor::DownloadFile(const char *url, const char *file_path) {
       return false;
     }
     if (res != CURLE_OK) {
-      log_web << get_time()
+      log_web << vntimefunc::GetLocalTimeString()
               << " curl_easy_perform() failed: " << curl_easy_strerror(res)
               << std::endl;
       curl_easy_cleanup(curl);
@@ -72,7 +72,7 @@ bool WebDataRequestor::ReadWebpage(const char *url, std::string &buffer) {
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, kTimeoutForCurl);
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      log_web << get_time()
+      log_web << vntimefunc::GetLocalTimeString()
               << "Bias: curl_easy_perform() failed: " << curl_easy_strerror(res)
               << std::endl;
       curl_easy_cleanup(curl);
@@ -92,7 +92,7 @@ bool WebDataRequestor::ReadWebpage(const char *url, std::string &buffer) {
 
 // Clear stringstream and input line string
 void WebDataRequestor::ClearInputStream(std::stringstream &ss,
-                                       std::string &line) {
+                                        std::string &line) {
   ss.clear();
   ss.str("");
   ss << line;
@@ -112,7 +112,7 @@ bool WebDataRequestor::RequestUsTecData() {
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, kTimeoutForCurl);
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      log_web << get_time()
+      log_web << vntimefunc::GetLocalTimeString()
               << "USTEC curl_easy_perform() failed: " << curl_easy_strerror(res)
               << std::endl;
     } else {
@@ -126,7 +126,8 @@ bool WebDataRequestor::RequestUsTecData() {
             if (line == ustec_fname) {
               curl_easy_cleanup(curl);
               curl_global_cleanup();
-              // log_ofs << get_time() << "USTEC not update, back" << std::endl;
+              // log_ofs << GetLocalTimeString() << "USTEC not update, back" <<
+              // std::endl;
               return false;
             }
             ustec_fname = line;
@@ -168,7 +169,8 @@ bool WebDataRequestor::RequestUsTecData() {
     }
     curl_easy_cleanup(curl);
     curl_global_cleanup();
-    log_web << get_time() << "received USTEC data" << std::endl;
+    log_web << vntimefunc::GetLocalTimeString() << "received USTEC data"
+            << std::endl;
     return true;
   }
   curl_easy_cleanup(curl);
@@ -178,8 +180,8 @@ bool WebDataRequestor::RequestUsTecData() {
 
 // Read line GPS data
 void WebDataRequestor::ReadGpsBiasCorr(int sv_prn, double value,
-                                    const std::string &chn_type,
-                                    BiasCorrData &bias) {
+                                       const std::string &chn_type,
+                                       BiasCorrData &bias) {
   if (chn_type.find("C1C") != std::string::npos) {
     bias.bias_GPS[VN_CODE_GPS_C1C][sv_prn].prn = sv_prn;
     bias.bias_GPS[VN_CODE_GPS_C1C][sv_prn].value = value;
@@ -199,8 +201,8 @@ void WebDataRequestor::ReadGpsBiasCorr(int sv_prn, double value,
 }
 
 void WebDataRequestor::ReadGalBiasCorr(int sv_prn, double value,
-                                    const std::string &chn_type,
-                                    BiasCorrData &bias) {
+                                       const std::string &chn_type,
+                                       BiasCorrData &bias) {
   if (chn_type.find("C1C") != std::string::npos) {
     bias.bias_GAL[VN_CODE_GAL_C1C][sv_prn].prn = sv_prn;
     bias.bias_GAL[VN_CODE_GAL_C1C][sv_prn].value = value;
@@ -228,8 +230,8 @@ void WebDataRequestor::ReadGalBiasCorr(int sv_prn, double value,
 // BDS-2 : prn 1-18; BDS-3: PRN 19-61
 // B2 feq channel: C7I for BDS-2, C7Z for BDS-3
 void WebDataRequestor::ReadBdsBiasCorr(int sv_prn, double value,
-                                    const std::string &chn_type,
-                                    BiasCorrData &cbias) {
+                                       const std::string &chn_type,
+                                       BiasCorrData &cbias) {
   if (chn_type.find("C2I") != std::string::npos) {
     cbias.bias_BDS[VN_CODE_BDS_C2I][sv_prn].prn = sv_prn;
     cbias.bias_BDS[VN_CODE_BDS_C2I][sv_prn].value = value;
@@ -295,10 +297,12 @@ std::optional<BiasCorrData> WebDataRequestor::ParseBiasFromBuff(
 
 // Establish connection to CODE bias url and write the data to buffer
 bool WebDataRequestor::RequestCodeBias() {
-  int year = get_year();
-  std::string CD_BIAS_URL = kGippCodeBiasCorrUrlHeader + std::to_string(year) + '/';
+  int year = vntimefunc::GetCurrentYear();
+  std::string CD_BIAS_URL =
+      kGippCodeBiasCorrUrlHeader + std::to_string(year) + '/';
   std::string buffer{}, line, OSB_ss{};
-  log_web << get_time() << "read code bias data source list" << std::endl;
+  log_web << vntimefunc::GetLocalTimeString()
+          << "read code bias data source list" << std::endl;
   if (!ReadWebpage(CD_BIAS_URL.c_str(), buffer)) {
     log_web << "read data list failed" << std::endl;
     return false;
@@ -311,7 +315,8 @@ bool WebDataRequestor::RequestCodeBias() {
     }
   }
   if (OSB_ss.empty()) {
-    log_web << get_time() << "get code bias file name failure: " << std::endl;
+    log_web << vntimefunc::GetLocalTimeString()
+            << "get code bias file name failure: " << std::endl;
     return false;
   }
   std::string tmp, fname;
@@ -322,21 +327,24 @@ bool WebDataRequestor::RequestCodeBias() {
   }
   ss >> fname;
   if (fname == code_bias_fname) {
-    log_web << get_time() << "get code bias file, but data not update"
-            << std::endl;
+    log_web << vntimefunc::GetLocalTimeString()
+            << "get code bias file, but data not update" << std::endl;
     return true;
   }
   CD_BIAS_URL = CD_BIAS_URL + fname;
-  log_web << get_time() << "get code bias link: " << CD_BIAS_URL << std::endl;
+  log_web << vntimefunc::GetLocalTimeString()
+          << "get code bias link: " << CD_BIAS_URL << std::endl;
   std::string data_path = file_path_ + "code_bias.BIA.gz";
   // 2. Download and uncompress code bias file
   if (!DownloadFile(CD_BIAS_URL.c_str(), data_path.c_str())) {
-    log_web << get_time() << "Download failed" << std::endl;
+    log_web << vntimefunc::GetLocalTimeString() << "Download failed"
+            << std::endl;
     return false;
   }
   gzFile fp = gzopen(data_path.c_str(), "rb");
   if (fp == nullptr) {
-    log_web << get_time() << "file not exist" << std::endl;
+    log_web << vntimefunc::GetLocalTimeString() << "file not exist"
+            << std::endl;
     return false;
   }
   std::vector<char> data;
@@ -350,13 +358,14 @@ bool WebDataRequestor::RequestCodeBias() {
 
   int n = remove(data_path.c_str());
   if (n == -1) {
-    log_web << get_time()
+    log_web << vntimefunc::GetLocalTimeString()
             << "remove code bias file failure: " << strerror(errno)
             << std::endl;
     return false;
   }
   if (data.empty()) {
-    log_web << get_time() << "No code bias data in the file" << std::endl;
+    log_web << vntimefunc::GetLocalTimeString()
+            << "No code bias data in the file" << std::endl;
     return false;
   }
   auto code_bias_data = ParseBiasFromBuff(data, "VALUE____");
@@ -364,21 +373,24 @@ bool WebDataRequestor::RequestCodeBias() {
     std::lock_guard<std::mutex> lock(code_mutex);
     code_bias = code_bias_data.value();
   } else {
-    log_web << get_time() << "Parse code bias failure" << std::endl;
+    log_web << vntimefunc::GetLocalTimeString() << "Parse code bias failure"
+            << std::endl;
     return false;
   }
   code_bias_fname = fname;
-  log_web << get_time() << "received code bias" << std::endl;
+  log_web << vntimefunc::GetLocalTimeString() << "received code bias"
+          << std::endl;
   return true;
 }
 
 // Establish connection to PRIDE phase bias url and write the data to buffer
 bool WebDataRequestor::RequestPhaseBias() {
-  int year = get_year();
+  int year = vntimefunc::GetCurrentYear();
   std::string P_BIAS_URL =
-          kWhuPhaseBiasCorrUrlHeader + std::to_string(year) + "/bias/";
+      kWhuPhaseBiasCorrUrlHeader + std::to_string(year) + "/bias/";
   std::string buffer{}, line, OSB_ss{};
-  log_web << get_time() << "read phase bias data source list" << std::endl;
+  log_web << vntimefunc::GetLocalTimeString()
+          << "read phase bias data source list" << std::endl;
   if (!ReadWebpage(P_BIAS_URL.c_str(), buffer)) {
     log_web << "read data list failed" << std::endl;
     return false;
@@ -391,7 +403,8 @@ bool WebDataRequestor::RequestPhaseBias() {
     }
   }
   if (OSB_ss.empty()) {
-    log_web << get_time() << "get phase bias file name failure: " << std::endl;
+    log_web << vntimefunc::GetLocalTimeString()
+            << "get phase bias file name failure: " << std::endl;
     return false;
   }
   std::string tmp, fname;
@@ -402,21 +415,24 @@ bool WebDataRequestor::RequestPhaseBias() {
   }
   ss >> fname;
   if (fname == phase_bias_fname) {
-    log_web << get_time() << "get phase bias file, but data not update"
-            << std::endl;
+    log_web << vntimefunc::GetLocalTimeString()
+            << "get phase bias file, but data not update" << std::endl;
     return true;
   }
   P_BIAS_URL = P_BIAS_URL + fname;
-  log_web << get_time() << "get phase bias link: " << P_BIAS_URL << std::endl;
+  log_web << vntimefunc::GetLocalTimeString()
+          << "get phase bias link: " << P_BIAS_URL << std::endl;
   std::string data_path = file_path_ + "phase_bias.BIA.gz";
   // 2. Download and uncompress code bias file
   if (!DownloadFile(P_BIAS_URL.c_str(), data_path.c_str())) {
-    log_web << get_time() << "Download failed" << std::endl;
+    log_web << vntimefunc::GetLocalTimeString() << "Download failed"
+            << std::endl;
     return false;
   }
   gzFile fp = gzopen(data_path.c_str(), "rb");
   if (fp == nullptr) {
-    log_web << get_time() << "file not exist" << std::endl;
+    log_web << vntimefunc::GetLocalTimeString() << "file not exist"
+            << std::endl;
     return false;
   }
   std::vector<char> data;
@@ -430,13 +446,14 @@ bool WebDataRequestor::RequestPhaseBias() {
 
   int n = remove(data_path.c_str());
   if (n == -1) {
-    log_web << get_time()
+    log_web << vntimefunc::GetLocalTimeString()
             << "remove phase bias file failure: " << strerror(errno)
             << std::endl;
     return false;
   }
   if (data.empty()) {
-    log_web << get_time() << "No phase bias data in the file" << std::endl;
+    log_web << vntimefunc::GetLocalTimeString()
+            << "No phase bias data in the file" << std::endl;
     return false;
   }
   auto phase_bias_data = ParseBiasFromBuff(data, "__ESTIMATED_VALUE____");
@@ -444,11 +461,13 @@ bool WebDataRequestor::RequestPhaseBias() {
     std::lock_guard<std::mutex> lock(phase_mutex);
     phase_bias = phase_bias_data.value();
   } else {
-    log_web << get_time() << "Parse phase bias failure" << std::endl;
+    log_web << vntimefunc::GetLocalTimeString() << "Parse phase bias failure"
+            << std::endl;
     return false;
   }
   phase_bias_fname = fname;
-  log_web << get_time() << "received phase bias" << std::endl;
+  log_web << vntimefunc::GetLocalTimeString() << "received phase bias"
+          << std::endl;
   return true;
 }
 
@@ -463,9 +482,9 @@ void WebDataRequestor::RequestWebData() {
   timeval tv{};
   uint64_t ustec_t, code_t, phase_t, file_t;
   gettimeofday(&tv, &tz);
-  ustec_t = code_t = phase_t = file_t = get_sec(tv);
-  periodic_info_t periodic{};
-  make_periodic(kCheckUsTecPeriod, periodic);
+  ustec_t = code_t = phase_t = file_t = vntimefunc::GetSecFromTimeval(tv);
+  timeperiodic::PeriodicInfoT periodic{};
+  timeperiodic::MakePeriodic(kCheckUsTecPeriod, periodic);
   // keep requesting until success
   /*   //Mute USTEC
   while (!RequestUsTecData())
@@ -481,7 +500,7 @@ void WebDataRequestor::RequestWebData() {
   ready = true;
   while (!done) {
     gettimeofday(&tv, &tz);
-    uint64_t now = get_sec(tv);
+    uint64_t now = vntimefunc::GetSecFromTimeval(tv);
     /*  // Mute USTEC
     // Request USTEC data begin at HH:MM, HH:05 HH:20 HH:35 HH:50.
     if (now / kUsTecPeriod != ustec_t / kUsTecPeriod) {
@@ -490,13 +509,15 @@ void WebDataRequestor::RequestWebData() {
     }
      */
     if (now / kBiasCorrUpdatePeriod != code_t / kBiasCorrUpdatePeriod) {
-      log_web << get_time() << "requesting code bias" << std::endl;
+      log_web << vntimefunc::GetLocalTimeString() << "requesting code bias"
+              << std::endl;
       if (RequestCodeBias()) {
         code_t = now;
       }
     }
     if (now / kBiasCorrUpdatePeriod != phase_t / kBiasCorrUpdatePeriod) {
-      log_web << get_time() << "requesting phase bias from PRIDE" << std::endl;
+      log_web << vntimefunc::GetLocalTimeString()
+              << "requesting phase bias from PRIDE" << std::endl;
       if (RequestPhaseBias()) {
         phase_t = now;
       }
@@ -506,7 +527,8 @@ void WebDataRequestor::RequestWebData() {
       log_web.close();
       log_path[2] = log_path[1];
       log_path[1] = log_path[0];
-      log_path[0] = file_path_ + "requestor_WEB_" + get_time_log() + ".log";
+      log_path[0] = file_path_ + "requestor_WEB_" +
+                    vntimefunc::GetLocalTimeStringForLog() + ".log";
       log_web.open(log_path[0].c_str());
       if (!log_web.is_open()) {
         fprintf(stderr, "requestor new WEB log file cannot be opened\n");
@@ -518,7 +540,7 @@ void WebDataRequestor::RequestWebData() {
       }
       file_t = now;
     }
-    wait_period(&periodic);
+    timeperiodic::WaitPeriod(&periodic);
   }
   pthread_exit(nullptr);
 }
@@ -545,7 +567,8 @@ void WebDataRequestor::StartRequest() {
   //    ;
   done = false;
   ready = false;
-  log_path[0] = file_path_ + "requestor_WEB_" + get_time_log() + ".log";
+  log_path[0] = file_path_ + "requestor_WEB_" +
+                vntimefunc::GetLocalTimeStringForLog() + ".log";
   log_web.open(log_path[0].c_str());
   if (!log_web.is_open()) {
     fprintf(stderr, "requestor log file cannot be opened\n");

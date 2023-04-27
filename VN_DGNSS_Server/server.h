@@ -9,7 +9,7 @@
 #include "IGGtrop.h"
 
 #define SEND_PERIOD 1000000  // Period of server send RTCM: 1s
-#define MAXNO_CLients 128    // Max no. of clients
+#define MAX_NUM_OF_CLIENTS 128    // Max no. of clients
 #define BUFF_SIZE 1200       // client position buffer size
 #define POSITION_MSG_HEADER "$POSECEF"
 
@@ -19,17 +19,9 @@ typedef struct SockInfo {
   pthread_t tid{};
   BkgDataRequestor *foo_bkg{};
   WebDataRequestor *foo_web{};
-  periodic_info_t periodic{};
+  timeperiodic::PeriodicInfoT periodic{};
   IGGexpModel TropData;
 } SockInfo;
-// typedef struct SockInfo{
-//  int fd;
-//  struct sockaddr_in addr;
-//  pthread_t tid;
-//  requestor *foo;
-//  periodic_info_t periodic;
-//  std::ostream *log;
-//} SockInfo;
 
 bool parse_position(std::string const &message,
                     std::vector<double> &position,
@@ -80,14 +72,14 @@ bool init_read_pos_client(SockInfo *client_info,
     if (ret == -1) {
       if (count == 4) {
         *client_info->client_sock.log
-            << get_time() << "client IP: " << client_ip
+            << vntimefunc::GetLocalTimeString() << "client IP: " << client_ip
             << ", Port: " << ntohs(client_info->client_sock.addr.sin_port)
             << " initial receive failed by" << strerror(errno) << std::endl;
       }
     } else if (ret == 0)  // -> orderly client disconnect
     {
       *client_info->client_sock.log
-          << get_time() << "client IP: " << client_ip
+          << vntimefunc::GetLocalTimeString() << "client IP: " << client_ip
           << ", Port: " << ntohs(client_info->client_sock.addr.sin_port)
           << " disconnected" << std::endl;
       return false;
@@ -95,12 +87,12 @@ bool init_read_pos_client(SockInfo *client_info,
       std::string message = buff;
       if (!parse_position(message, client_pos_ecef,infor))
         *client_info->client_sock.log
-            << get_time() << "client IP: " << client_ip
+            << vntimefunc::GetLocalTimeString() << "client IP: " << client_ip
             << ", Port: " << ntohs(client_info->client_sock.addr.sin_port)
             << " failure parsing initial client position message" << std::endl;
       else {
         *client_info->client_sock.log
-            << get_time() << "Get client IP: " << client_ip
+            << vntimefunc::GetLocalTimeString() << "Get client IP: " << client_ip
             << ", Port: " << ntohs(client_info->client_sock.addr.sin_port)
             << " position (ECEF): " << std::setprecision(12) << client_pos_ecef[0]
             << " " << client_pos_ecef[1] << " " << client_pos_ecef[2] << std::endl;
@@ -111,7 +103,7 @@ bool init_read_pos_client(SockInfo *client_info,
   }
   if (count == 5) {
     *client_info->client_sock.log
-        << get_time() << "client IP: " << client_ip
+        << vntimefunc::GetLocalTimeString() << "client IP: " << client_ip
         << ", Port: " << ntohs(client_info->client_sock.addr.sin_port)
         << " initial receive failure" << std::endl;
     return false;
@@ -141,7 +133,7 @@ void *pth_handler(void *arg) {
             INET_ADDRSTRLEN);
   // print IP and port of client
   *client_info->client_sock.log
-      << get_time() << "accept client IP: " << client_ip
+      << vntimefunc::GetLocalTimeString() << "accept client IP: " << client_ip
       << " Port: " << Port_num
       << std::endl;
   std::vector<double> client_pos_ecef(3, 0);
@@ -161,7 +153,7 @@ void *pth_handler(void *arg) {
     infor.code_F1[2] = VN_CODE_BDS_C2I;
     infor.code_F2[2] = VN_CODE_BDS_C7;
     *client_info->client_sock.log
-        << get_time() << "Use server position for client IP: " << client_ip
+        << vntimefunc::GetLocalTimeString() << "Use server position for client IP: " << client_ip
         << " Port: " << Port_num
         << std::endl;
   }
@@ -191,17 +183,17 @@ void *pth_handler(void *arg) {
     }
     datagent genRTCM(client_pos_ecef);
     client_info->client_sock.send_check = true; // If send error, false in sendRTCM
-    srtt = get_time_sec();
+    srtt = vntimefunc::GetSystemTimeInSec();
     if (genRTCM.computemeasrements(client_info->foo_bkg,
                                    client_info->foo_web, rst,
                                    infor, client_info->TropData,
                                    phw_gps_track,iter)) {
       genRTCM.sendRTCM(&client_info->client_sock);
     }
-    endt = get_time_sec();
+    endt = vntimefunc::GetSystemTimeInSec();
     if (client_info->client_sock.send_check){
       if ((endt - srtt) < SEND_PERIOD)
-        wait_period(&client_info->periodic);
+        timeperiodic::WaitPeriod(&client_info->periodic);
       else {
         rst << "Warning: Request and Computation time exceed 1s, continue."
             << std::endl;
@@ -217,7 +209,7 @@ void *pth_handler(void *arg) {
     if (ret == -1) {
       if (!(errno == EWOULDBLOCK || errno == EAGAIN || errno == EINTR)) {
         *client_info->client_sock.log
-            << get_time() << "Close client IP: " << client_ip
+            << vntimefunc::GetLocalTimeString() << "Close client IP: " << client_ip
             << ", Port: " << ntohs(client_info->client_sock.addr.sin_port)
             << " due to unexpected read error: " << strerror(errno)
             << std::endl;
@@ -225,25 +217,25 @@ void *pth_handler(void *arg) {
       }
     } else if (ret == 0) {
       *client_info->client_sock.log
-          << get_time() << "client IP: " << client_ip
+          << vntimefunc::GetLocalTimeString() << "client IP: " << client_ip
           << ", Port: " << ntohs(client_info->client_sock.addr.sin_port)
           << " disconnected" << std::endl;
       break;
     } else if (ret > 0) {
       *client_info->client_sock.log
-          << get_time() << "client IP: " << client_ip
+          << vntimefunc::GetLocalTimeString() << "client IP: " << client_ip
           << ", Port: " << ntohs(client_info->client_sock.addr.sin_port)
           << " Position data received" << std::endl;
       std::string message = buff;
       // updates client_position
       if (!parse_position(message, client_pos_ecef, infor)) {
         *client_info->client_sock.log
-            << get_time() << "client IP: " << client_ip
+            << vntimefunc::GetLocalTimeString() << "client IP: " << client_ip
             << ", Port: " << ntohs(client_info->client_sock.addr.sin_port)
             << " failure parsing position message" << std::endl;
       } else {
         *client_info->client_sock.log
-            << get_time() << "Get client IP: " << client_ip
+            << vntimefunc::GetLocalTimeString() << "Get client IP: " << client_ip
             << ", Port: " << ntohs(client_info->client_sock.addr.sin_port)
             << " position (ECEF): " << std::setprecision(12) << client_pos_ecef[0]
             << " " << client_pos_ecef[1] << " " << client_pos_ecef[2]
