@@ -28,45 +28,45 @@ static int infor_to_rtcm_code(int info_code, int sys,int prn) {
   switch (sys) {
   case SYS_GPS: {
     switch (info_code) {
-    case code_GPS_C1C:
+    case VN_CODE_GPS_C1C:
       return CODE_L1C;
-    case code_GPS_C1W:
+    case VN_CODE_GPS_C1W:
       return CODE_L1W;
-    case code_GPS_C2C:
+    case VN_CODE_GPS_C2C:
       return CODE_L2C;
-    case code_GPS_C2W:
+    case VN_CODE_GPS_C2W:
       return CODE_L2W;
-    case code_GPS_C2L:
+    case VN_CODE_GPS_C2L:
       return CODE_L2L;
     default: return CODE_NONE;
     }
   }
   case SYS_GAL: {
     switch (info_code) {
-    case code_GAL_C1C:
+    case VN_CODE_GAL_C1C:
       return CODE_L1C;
-    case code_GAL_C1X:
+    case VN_CODE_GAL_C1X:
       return CODE_L1X;
-    case code_GAL_C6C:
+    case VN_CODE_GAL_C6C:
       return CODE_L6C;
-    case code_GAL_C5Q:
+    case VN_CODE_GAL_C5Q:
       return CODE_L5Q;
-    case code_GAL_C5X:
+    case VN_CODE_GAL_C5X:
       return CODE_L5X;
-    case code_GAL_C7Q:
+    case VN_CODE_GAL_C7Q:
       return CODE_L7Q;
-    case code_GAL_C7X:
+    case VN_CODE_GAL_C7X:
       return CODE_L7X;
     default: return CODE_NONE;
     }
   }
   case SYS_CMP: {
     switch (info_code) {
-    case code_BDS_C2I:
+    case VN_CODE_BDS_C2I:
       return CODE_L2I;
-    case code_BDS_C6I:
+    case VN_CODE_BDS_C6I:
       return CODE_L6I;
-    case code_BDS_C7:
+    case VN_CODE_BDS_C7:
       if (prn <= 18) {
         return CODE_L7I;
       } else {
@@ -90,30 +90,29 @@ void datagent::getgpstnow() {
                gpst_now); // get current GPS time and days of year
 }
 
-void datagent::getcorrdata(requestor_BKG *foo_bkg, requestor_web *foo_web,
+void datagent::getcorrdata(BkgDataRequestor *foo_bkg, WebDataRequestor *foo_web,
                            std::ostream &rst) {
   // get USTEC ionospheric data
   ustec_data = foo_web->get_ustec_data();
   // get clock correction data
-  clock_data = foo_bkg->get_clock_data();
+  clock_data = foo_bkg->GetSatClockCorrEpochs();
   // get orbit correction data
-  orbit_data = foo_bkg->get_orbit_data();
+  orbit_data = foo_bkg->GetSatOrbitCorrEpochs();
   // get hardware bias
   code_bias = foo_web->get_code_bias();
   phase_bias = foo_web->get_phase_bias();
-  code_bias_ssr = foo_bkg->get_code_bias();
-  phase_bias_ssr = foo_bkg->get_phase_bias();
-  // phase_bias = foo_web->get_phase_bias();
+  code_bias_ssr = foo_bkg->GetSsrCodeBiasCorr();
+  phase_bias_ssr = foo_bkg->GetSsrPhaseBiasCorr();
   // get ephemeris data
-  eph_data = foo_bkg->get_eph_data();
-  vtec_CNE = foo_bkg->get_vtec_data();
+  eph_data = foo_bkg->GetGnssEphDataEpochs();
+  vtec_CNE = foo_bkg->GetSsrVTecCorr();
 }
 
 // Find orbit data that match the selected PRN.
 bool datagent::orbit_pick(std::ostream &rst, int prn, int sys,
-                          orbit_element &obt_sv, gtime_t &obt_t) {
+                          SatOrbitPara &obt_sv, gtime_t &obt_t) {
   for (int i = 0;i<3;i++) {
-    orbit_element obt_elem;
+  SatOrbitPara obt_elem;
     gtime_t ssrt_sys;
     switch (sys) {
     case SYS_GPS:
@@ -142,9 +141,9 @@ bool datagent::orbit_pick(std::ostream &rst, int prn, int sys,
 }
 
 bool datagent::clock_pick(std::ostream &rst, int prn, int sys,
-                          clock_element &clk_sv, gtime_t &clk_t) {
+                          SatClockPara &clk_sv, gtime_t &clk_t) {
   for (int i = 0;i<3;i++) {
-    clock_element clk_elem;
+    SatClockPara clk_elem;
     gtime_t ssrt_sys;
     switch (sys) {
     case SYS_GPS:
@@ -172,7 +171,7 @@ bool datagent::clock_pick(std::ostream &rst, int prn, int sys,
   return false;
 }
 
-bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web,
+bool datagent::computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *foo_web,
                                   std::ostream &rst, const sys_infor& infor,
                                   const IGGexpModel& TropData,
                                   std::vector<std::vector<double>> &phw_track,
@@ -211,7 +210,7 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
     }
   }
 
-  if (vtec_CNE.check) {
+  if (vtec_CNE.received) {
     if (log_out) {
       rst << "SSR VTEC used." << std::endl;
     }
@@ -279,9 +278,9 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
     if (infor.sys[sys_i] && infor.code_F1[sys_i] != -1) {
       std::vector<SatBias> cbias_sv1, cbias_sv2;
       std::vector<SatBias> pbias_sv1, pbias_sv2;
-      cbias_ver cbias_sv;
-      pbias_ver pbias_sv;
-      std::vector<SatStruct::Ephemeris> eph_sv[EPH_VERMAX];
+      CodeBiasCorr cbias_sv;
+      PhaseBiasCorr pbias_sv;
+      std::vector<satstruct::Ephemeris> eph_sv[VN_MAX_NUM_OF_EPH_EPOCH];
       double sys_F1, sys_F2;
       switch (sys_i) {
       case 0:
@@ -293,7 +292,7 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
         cbias_sv2 = code_bias.bias_GPS[infor.code_F2[sys_i]];
         pbias_sv1 = phase_bias.bias_GPS[infor.code_F1[sys_i]];
         pbias_sv2 = phase_bias.bias_GPS[infor.code_F2[sys_i]];
-        for (int j=0;j<EPH_VERMAX;j++) { // Copy different version
+        for (int j=0;j< VN_MAX_NUM_OF_EPH_EPOCH;j++) { // Copy different version
           eph_sv[j] = eph_data[j].GPS_eph;
         }
         sys_F1 = FREQL1;
@@ -308,7 +307,7 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
         cbias_sv2 = code_bias.bias_GAL[infor.code_F2[sys_i]];
         pbias_sv1 = phase_bias.bias_GAL[infor.code_F1[sys_i]];
         pbias_sv2 = phase_bias.bias_GAL[infor.code_F2[sys_i]];
-        for (int j=0;j<EPH_VERMAX;j++) {
+        for (int j=0;j< VN_MAX_NUM_OF_EPH_EPOCH;j++) {
           eph_sv[j] = eph_data[j].GAL_eph;
         }
         sys_F1 = FREQL1;
@@ -323,15 +322,15 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
         cbias_sv2 = code_bias.bias_BDS[infor.code_F2[sys_i]];
         pbias_sv1 = phase_bias.bias_BDS[infor.code_F1[sys_i]];
         pbias_sv2 = phase_bias.bias_BDS[infor.code_F2[sys_i]];
-        for (int j=0;j<EPH_VERMAX;j++) {
+        for (int j=0;j< VN_MAX_NUM_OF_EPH_EPOCH;j++) {
           eph_sv[j] = eph_data[j].BDS_eph;
         }
         sys_F1 = FREQ1_CMP;
         sys_F2 = FREQ2_CMP;
         break;
       }
-      clock_element clk_sv;
-      orbit_element obt_sv;
+      SatClockPara clk_sv;
+      SatOrbitPara obt_sv;
       gtime_t t_clk{},t_obt{};
       for (int prn = 1; prn < max_prn + 1; prn++) {
         if (sys_i == 2) {
@@ -359,7 +358,7 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
           continue;
         }
         int ver = -1;
-        for (int j=0;j<EPH_VERMAX;j++) { // Checking for different eph version
+        for (int j=0;j< VN_MAX_NUM_OF_EPH_EPOCH;j++) { // Checking for different eph version
           if (obt_sv.IOD==eph_sv[j][prn].IODE && eph_sv[j][prn].prn != -1) {
             ver = j;
             break;
@@ -392,7 +391,7 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
           //record_0(phw_gps_track, prn_idx);
           continue;
         }
-        SatPosClkComp spco(gpst_now, obt_sv.dx, obt_sv.dv, t_obt, clk_sv.dt_corr,
+        SatPosClkComp spco(gpst_now, obt_sv.dx_m, obt_sv.dv_m, t_obt, clk_sv.dt_corr_s,
                            t_clk, eph_sv[ver][prn],sys);
         // compute propagation time using optimization function
         spco.PropTimeOptm(user_pos);
@@ -426,7 +425,7 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
         // compute ionospheric delay
         double iono_delay_L1 = 0, iono_delay_L2 = 0;
         // If SSR VTEC not avaliable, then using USTEC
-        if (vtec_CNE.check) {
+        if (vtec_CNE.received) {
           SSR_VTEC VTEC;
           iono_delay_L1 = VTEC.stec(vtec_CNE,gpst_now.sec,user_pos,sat_pos_precise,sys_F1);
           iono_delay_L2 =
@@ -455,19 +454,19 @@ bool datagent::computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web
         double trop_IGG = IGG.IGGtropdelay(uLon*R2D,user_lat*R2D,user_h/1000,
                                            doy,user_elev,TropData.data);
 
-        single_bias code_bias_f1 = cbias_sv.data[prn].bias_ele[infor.code_F1[sys_i]];
-        single_bias phase_bias_f1 = pbias_sv.data[prn].bias_ele[infor.code_F1[sys_i]];
+        BiasElement code_bias_f1 = cbias_sv.data[prn].bias_ele[infor.code_F1[sys_i]];
+        BiasElement phase_bias_f1 = pbias_sv.data[prn].bias_ele[infor.code_F1[sys_i]];
 
         if (isnan(norm_range)) {
           rst << "sat prc pos rotated: " << std::setprecision(13) << " "
               << sat_pos_precise[0] << " " << sat_pos_precise[1] << " "
               << sat_pos_precise[2] << std::endl;
-          rst << "dx[0] ,dv[0],dt_corr[0]: " << obt_sv.dx[0]
-              << " " << obt_sv.dv[0] << clk_sv.dt_corr[0] <<std::endl;
+          rst << "dx[0] ,dv[0],dt_corr[0]: " << obt_sv.dx_m[0]
+              << " " << obt_sv.dv_m[0] << clk_sv.dt_corr_s[0] <<std::endl;
           rst << "timedoff now to ssr: "<<timediff(gpst_now,t_obt)
               <<" "<<timediff(gpst_now,t_clk) <<std::endl;
         }
-        if (!code_bias_f1.check) {
+        if (!code_bias_f1.received) {
           phw_track[sys_i][prn] = 0;
           continue;
         }

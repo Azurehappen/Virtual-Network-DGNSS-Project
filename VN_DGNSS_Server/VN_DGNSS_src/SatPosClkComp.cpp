@@ -51,7 +51,7 @@ static double F_define(int sys) {
 
 SatPosClkComp::SatPosClkComp(gtime_t rcv_t, std::vector<double> dX, std::vector<double> dV,
                              gtime_t orb_corr_time, std::vector<double> dt_corr,
-                             gtime_t clk_corr_time, SatStruct::Ephemeris eph_data_0, int sys)
+                             gtime_t clk_corr_time, satstruct::Ephemeris eph_data_0, int sys)
     : received_time(rcv_t),
       eph_0(eph_data_0),
       dX_rac(std::move(dX)),

@@ -40,8 +40,8 @@ void wait_period(periodic_info_t *info) {
   info->wakeups_missed += missed;
 }
 
-void datetotow(std::vector<double> date_time, int& gps_week, int& gps_dow,
-               double& gps_sow) {
+void datetotow(std::vector<double> date_time, int &gps_week, int &gps_dow,
+               double &gps_sow) {
   const int doy[] = {1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335};
   const int gps_startnum =
       3657; /* gps time reference [1980 1 6], date number start at [1970 1 1]*/
@@ -61,32 +61,31 @@ void datetotow(std::vector<double> date_time, int& gps_week, int& gps_dow,
       gps_dow * 86400 + date_time[3] * 3600 + date_time[4] * 60 + date_time[5];
 }
 
-double limit_gpst(double time_diff)
-{
-    if(time_diff > 302400) {
-        time_diff-=604800;
-    }
-    else if(time_diff < -302400) {
-        time_diff+= 604800;
-    }
-    return time_diff;
+double limit_gpst(double time_diff) {
+  if (time_diff > 302400) {
+    time_diff -= 604800;
+  } else if (time_diff < -302400) {
+    time_diff += 604800;
+  }
+  return time_diff;
 }
 
 double get_time_sec() {
-    struct timezone tz({0, 0});
-    timeval tv{};
-    gettimeofday(&tv, &tz);
-    return (double)tv.tv_sec * 1000000 + tv.tv_usec;
+  struct timezone tz({0, 0});
+  timeval tv{};
+  gettimeofday(&tv, &tz);
+  return (double)tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
-void  get_gpst_now(std::vector<double> &date_time_gps,int &doy,gtime_t &gpstnow) {
+void get_gpst_now(std::vector<double> &date_time_gps, int &doy,
+                  gtime_t &gpstnow) {
   time_t tt;
   struct tm *pt;
   time(&tt);
   pt = gmtime(&tt);
   // cout<<"Current UTC time (hour:minute:sec): "<<pt->tm_hour<<"
   // "<<pt->tm_min<<" "<<pt->tm_sec<<endl;
-  //rst << "Current UTC time (hour:minute:sec): " << pt->tm_hour << " "
+  // rst << "Current UTC time (hour:minute:sec): " << pt->tm_hour << " "
   //   << pt->tm_min << " " << pt->tm_sec << endl;
   time_t rawtime;
   struct tm *ptm;
@@ -101,7 +100,9 @@ void  get_gpst_now(std::vector<double> &date_time_gps,int &doy,gtime_t &gpstnow)
   date_time_gps[5] = ptm->tm_sec;
   doy = ptm->tm_yday;
   double epoch_gpst[6];
-  for (int i=0;i<6;i++) epoch_gpst[i] = date_time_gps[i];
+  for (int i = 0; i < 6; i++) {
+    epoch_gpst[i] = date_time_gps[i];
+  }
   gpstnow = epoch2time(epoch_gpst);
 }
 
@@ -125,8 +126,8 @@ std::string get_time_log() {
   time(&rawtime);
   ltm = localtime(&rawtime);
   char buf[9];
-  sprintf(buf, "%04d%02d%02d", ltm->tm_year + 1900,
-          ltm->tm_mon + 1, ltm->tm_mday);
+  sprintf(buf, "%04d%02d%02d", ltm->tm_year + 1900, ltm->tm_mon + 1,
+          ltm->tm_mday);
   return std::string(buf);
 }
 

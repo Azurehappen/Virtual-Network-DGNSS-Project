@@ -17,8 +17,8 @@
 typedef struct SockInfo {
   SockRTCM client_sock{};
   pthread_t tid{};
-  requestor_BKG *foo_bkg{};
-  requestor_web *foo_web{};
+  BkgDataRequestor *foo_bkg{};
+  WebDataRequestor *foo_web{};
   periodic_info_t periodic{};
   IGGexpModel TropData;
 } SockInfo;
@@ -51,7 +51,7 @@ bool parse_position(std::string const &message,
     int code;
     ss >> code;
     if (code>0) {
-      infor.code_F1[i] = code; // See definition in requestor_web.h
+      infor.code_F1[i] = code;
     } else if (code == 0) {
       disable++;
       infor.sys[i] = false;
@@ -61,9 +61,9 @@ bool parse_position(std::string const &message,
   if (!ss.good() || disable >=3 ) {
     return false;
   }
-  infor.code_F2[0] = code_GPS_C2L;
-  infor.code_F2[1] = code_GAL_C7Q;
-  infor.code_F2[2] = code_BDS_C7;
+  infor.code_F2[0] = VN_CODE_GPS_C2L;
+  infor.code_F2[1] = VN_CODE_GAL_C7Q;
+  infor.code_F2[2] = VN_CODE_BDS_C7;
   position = ret;
   return true;
 }
@@ -154,12 +154,12 @@ void *pth_handler(void *arg) {
     client_pos_ecef[0] = -2430697.699;
     client_pos_ecef[1] = -4704189.201;
     client_pos_ecef[2] = 3544329.103;
-    infor.code_F1[0] = code_GPS_C1C;
-    infor.code_F2[0] = code_GPS_C2L;
-    infor.code_F1[1] = code_GAL_C1C;
-    infor.code_F2[1] = code_GAL_C7Q;
-    infor.code_F1[2] = code_BDS_C2I;
-    infor.code_F2[2] = code_BDS_C7;
+    infor.code_F1[0] = VN_CODE_GPS_C1C;
+    infor.code_F2[0] = VN_CODE_GPS_C2L;
+    infor.code_F1[1] = VN_CODE_GAL_C1C;
+    infor.code_F2[1] = VN_CODE_GAL_C7Q;
+    infor.code_F1[2] = VN_CODE_BDS_C2I;
+    infor.code_F2[2] = VN_CODE_BDS_C7;
     *client_info->client_sock.log
         << get_time() << "Use server position for client IP: " << client_ip
         << " Port: " << Port_num

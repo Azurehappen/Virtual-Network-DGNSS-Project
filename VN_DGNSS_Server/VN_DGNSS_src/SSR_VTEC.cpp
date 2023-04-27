@@ -83,7 +83,7 @@ void SSR_VTEC::piercePoint(double layerHeight, double epoch, const double* geocS
   _lonS = fmod((_lambdaPP + (epoch - 50400) * M_PI / 43200), 2*M_PI);
 }
 
-double SSR_VTEC::vtecSingleLayerContribution(const vtec_t& tec) const {
+double SSR_VTEC::vtecSingleLayerContribution(const VTecCorrection& tec) const {
 
   double vtec = 0.0;
   int N = tec.nDeg;
@@ -102,8 +102,8 @@ double SSR_VTEC::vtecSingleLayerContribution(const vtec_t& tec) const {
         fac = sqrt(2.0 * (2.0 * n + 1) * a / b);
       }
       pnm *= fac;
-      double Cnm_mlambda = tec.cosCoeffs[n][m] * cos(m * _lonS);
-      double Snm_mlambda = tec.sinCoeffs[n][m] * sin(m * _lonS);
+      double Cnm_mlambda = tec.cos_coeffs[n][m] * cos(m * _lonS);
+      double Snm_mlambda = tec.sin_coeffs[n][m] * sin(m * _lonS);
       vtec += (Snm_mlambda + Cnm_mlambda) * pnm;
     }
   }
@@ -115,7 +115,7 @@ double SSR_VTEC::vtecSingleLayerContribution(const vtec_t& tec) const {
   return vtec;
 }
 
-double SSR_VTEC::stec(const vtec_t& tec, double gpst_sec, const std::vector<double>& r_ecef,
+double SSR_VTEC::stec(const VTecCorrection& tec, double gpst_sec, const std::vector<double>& r_ecef,
                       const std::vector<double>& xyzSat, double sys_F1) {
 
   // Latitude, longitude, height are defined with respect to a spherical earth model
@@ -132,7 +132,7 @@ double SSR_VTEC::stec(const vtec_t& tec, double gpst_sec, const std::vector<doub
   double user_r = sqrt(r_ecef[0]*r_ecef[0]+
                        r_ecef[1]*r_ecef[1]+r_ecef[2]*r_ecef[2]);
   double stec = 0.0;
-  piercePoint(tec.height, epoch, geocSta, user_r,azel);
+  piercePoint(tec.height_m, epoch, geocSta, user_r,azel);
   double vtec = vtecSingleLayerContribution(tec);
   stec += vtec / sin(azel[1] + _psiPP);
   return stec*40.3e16/sys_F1/sys_F1;

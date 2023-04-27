@@ -1,0 +1,32 @@
+#ifndef VN_DGNSS_SERVER_CONSTANTS_H
+#define VN_DGNSS_SERVER_CONSTANTS_H
+
+#define VN_CODE_GPS_NONE 0
+#define VN_CODE_GPS_C1C 1
+#define VN_CODE_GPS_C1W 2
+#define VN_CODE_GPS_C2C 3
+#define VN_CODE_GPS_C2W 4
+#define VN_CODE_GPS_C2L 5
+#define MAX_VN_CODE_GPS 6
+
+#define VN_CODE_GAL_NONE 0
+#define VN_CODE_GAL_C1C 1
+#define VN_CODE_GAL_C1X 2
+#define VN_CODE_GAL_C6C 3
+#define VN_CODE_GAL_C5Q 4
+#define VN_CODE_GAL_C5X 5
+#define VN_CODE_GAL_C7Q 6
+#define VN_CODE_GAL_C7X 7
+#define MAX_VN_CODE_GAL 8
+
+#define VN_CODE_BDS_NONE 0
+#define VN_CODE_BDS_C2I 1
+#define VN_CODE_BDS_C6I 2
+#define VN_CODE_BDS_C7 3
+#define MAX_VN_CODE_BDS 4
+
+#define MAX_CODE_ELEMENTS 10
+
+#define VN_MAX_NUM_OF_EPH_EPOCH 10
+
+#endif  // VN_DGNSS_SERVER_CONSTANTS_H

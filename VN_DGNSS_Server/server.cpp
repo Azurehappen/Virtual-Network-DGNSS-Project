@@ -66,14 +66,14 @@ int main(int argc, char *argv[]) {
   serverlog << get_time() << "Waiting for client..." << std::endl;
 
   // 4.Start requestor
-  requestor_BKG *foo_bkg;
-  requestor_web *foo_web;
+  BkgDataRequestor *foo_bkg;
+  WebDataRequestor *foo_web;
   std::string FOLDER_PATH = "../Log/";  // Specify the path of correction data
-  foo_bkg = new requestor_BKG(FOLDER_PATH);
-  foo_web = new requestor_web(FOLDER_PATH);
+  foo_bkg = new BkgDataRequestor(FOLDER_PATH);
+  foo_web = new WebDataRequestor(FOLDER_PATH);
   // start requesting data
-  foo_bkg->start_request();
-  foo_web->start_request();
+  foo_bkg->StartRequestor();
+  foo_web->StartRequest();
   while (!(foo_web->ready && foo_bkg->ssr_ready && foo_bkg->eph_ready)) {
     sleep(2);
   }
@@ -143,8 +143,8 @@ int main(int argc, char *argv[]) {
   }
 
   // 6.close
-  foo_bkg->end_request();
-  foo_web->end_request();
+  foo_bkg->EndRequestor();
+  foo_web->EndRequest();
   close(socket_fd);
 
   // terminate main thread

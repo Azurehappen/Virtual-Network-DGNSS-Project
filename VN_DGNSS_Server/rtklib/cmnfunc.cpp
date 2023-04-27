@@ -532,7 +532,7 @@ extern void freenav(nav_t *nav, int opt)
 * args   : double *r        I   ecef position {x,y,z} (m)
 *          double *pos      O   geodetic position {lat,lon,h} (rad,m)
 * return : none
-* notes  : WGS84, ellipsoidal height
+* notes  : WGS84, ellipsoidal height in meter
 *-----------------------------------------------------------------------------*/
 extern void ecef2pos(const double *r, double *pos)
 {
@@ -553,7 +553,7 @@ extern void ecef2pos(const double *r, double *pos)
 * args   : double *pos      I   geodetic position {lat,lon,h} (rad,m)
 *          double *r        O   ecef position {x,y,z} (m)
 * return : none
-* notes  : WGS84, ellipsoidal height
+* notes  : WGS84, ellipsoidal height in meter
 *-----------------------------------------------------------------------------*/
 extern void pos2ecef(const double *pos, double *r)
 {

@@ -2,12 +2,12 @@
 #include "IGGtrop.h"
 #include "IonoDelay.h"
 #include "SatPosClkComp.h"
+#include "bkg_data_requestor.h"
 #include "data2rtcm.h"
 #include "geoid.h"
-#include "requestor_BKG.h"
-#include "requestor_web.h"
 #include "rtklib.h"
 #include "time_common_func.h"
+#include "web_data_requestor.h"
 
 struct sys_infor {
   // System check, sys[0] GPS, sys[1] GAL, sys[2] BDS
@@ -25,16 +25,16 @@ struct sys_infor {
 class datagent {
  public:
   explicit datagent(std::vector<double> pos_ecef);
-  void getcorrdata(requestor_BKG *foo_bkg, requestor_web *foo_web, std::ostream &rst);
-  bool computemeasrements(requestor_BKG *foo_bkg, requestor_web *foo_web,
+  void getcorrdata(BkgDataRequestor *foo_bkg, WebDataRequestor *foo_web, std::ostream &rst);
+  bool computemeasrements(BkgDataRequestor *foo_bkg, WebDataRequestor *foo_web,
                           std::ostream &rst, const sys_infor& infor,
                           const IGGexpModel& TropData,
                           std::vector<std::vector<double>> &phw_track,
                           int log_count);
   bool orbit_pick(std::ostream &rst,int prn, int sys,
-                  orbit_element &obt_sv, gtime_t &obt_t);
+                  SatOrbitPara &obt_sv, gtime_t &obt_t);
   bool clock_pick(std::ostream &rst,int prn, int sys,
-                  clock_element &clk_sv, gtime_t &clk_t);
+                  SatClockPara &clk_sv, gtime_t &clk_t);
   void getgpstnow();
   void sendRTCM(SockRTCM *client_info);
   ~datagent();
@@ -44,16 +44,16 @@ class datagent {
   int num_sv{};  // Number of satellites available
   std::vector<int> num_in_sys{};
   const std::vector<double> user_pos;  // User position in ECEF (ITRF 2014)
-  ustec ustec_data;
-  vtec_t vtec_CNE;
-  std::vector<ssr_clock> clock_data;
-  std::vector<ssr_orbit> orbit_data;
+  UsTecCorrData ustec_data;
+  VTecCorrection vtec_CNE;
+  std::vector<SsrClockCorrEpoch> clock_data;
+  std::vector<SsrOrbitCorrEpoch> orbit_data;
   BiasCorrData code_bias;
   BiasCorrData phase_bias;
-  cbias_ssr code_bias_ssr;
-  pbias_ssr phase_bias_ssr;
+  SsrCodeBiasEpoch code_bias_ssr;
+  SsrPhaseBiasEpoch phase_bias_ssr;
   //std::vector<gps_phase_bias> phase_bias;
-  std::vector<eph_struct> eph_data;
+  std::vector<GnssEphStruct> eph_data;
   gtime_t gpst_now{};
   int doy{};  // day of year
   std::vector<double> date_gps;

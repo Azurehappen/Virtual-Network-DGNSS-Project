@@ -9,14 +9,12 @@
 class SatPosClkComp {
 public:
   // instance of the structure
-  SatStruct::Ephemeris eph_0;
+    satstruct::Ephemeris eph_0;
 
-  /*
-   * Constructor for ephemeris usage class
-   */
+  // Constructor for ephemeris usage class
   SatPosClkComp(gtime_t rcv_t, std::vector<double> dX, std::vector<double> dV,
                 gtime_t  orb_corr_time, std::vector<double> dt_corr,
-                gtime_t  clk_corr_time, SatStruct::Ephemeris eph_data_0, int sys);
+                gtime_t  clk_corr_time, satstruct::Ephemeris eph_data_0, int sys);
 
   // limit gps time
   static double limit_gpstime(double t_gps);

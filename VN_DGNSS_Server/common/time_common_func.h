@@ -1,13 +1,15 @@
 #pragma once
+#include <arpa/inet.h>
 #include <sys/time.h>
 #include <sys/timerfd.h>
-#include "rtklib.h"
-#include <arpa/inet.h>
 #include <unistd.h>
+
 #include <fstream>
 #include <iostream>
 #include <mutex>
 #include <sstream>
+
+#include "rtklib.h"
 struct periodic_info_t {
   int timer_fd;
   unsigned long long wakeups_missed;
@@ -15,10 +17,12 @@ struct periodic_info_t {
 
 int make_periodic(unsigned int period_micro_second, periodic_info_t &info);
 void wait_period(periodic_info_t *info);
-void datetotow(std::vector<double> date_time, int& gps_week, int& gps_dow, double& gps_sow);
+void datetotow(std::vector<double> date_time, int &gps_week, int &gps_dow,
+               double &gps_sow);
 double limit_gpst(double time_diff);
 double get_time_sec();
-void  get_gpst_now(std::vector<double> &date_time_gps,int &doy,gtime_t &gpstnow);
+void get_gpst_now(std::vector<double> &date_time_gps, int &doy,
+                  gtime_t &gpstnow);
 std::string get_time();
 std::string get_time_log();
 int get_year();
