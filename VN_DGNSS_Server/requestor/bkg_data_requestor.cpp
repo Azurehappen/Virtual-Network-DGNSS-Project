@@ -15,6 +15,10 @@ static constexpr int kSsrlogPeriod = 1800;
 static constexpr int kFilePeriod = 86400;
 // received IP port period in microseconds (2 s)
 static constexpr int kPortCheckPeriod = 2 * 1000000;
+// WHU stream title
+static constexpr const char *kWhuStream = "SSRA00WHU";
+// CNE stream title
+static constexpr const char *kCneStream = "SSRA00CNE";
 
 // adjust time considering week handover
 static gtime_t AdjustByGpsWeekHandover(gtime_t t, gtime_t t0) {
@@ -227,14 +231,17 @@ int BkgDataRequestor::RequestSsrData() {
       if (line[0] == '>') {
         ClearInputStream(line_ss, line);
         line_ss >> symbol >> type;
-        if (type == "CLOCK" || type == "ORBIT" || type == "VTEC" ||
-            type == "CODE_BIAS" || type == "PHASE_BIAS") {
+        if ((line.find(kWhuStream) != std::string::npos &&
+             (type == "CLOCK" || type == "ORBIT")) ||
+            (line.find(kCneStream) != std::string::npos &&
+             (type == "VTEC" || type == "CODE_BIAS" || type == "PHASE_BIAS"))) {
           line_ss >> datetime[0] >> datetime[1] >> datetime[2] >> datetime[3] >>
               datetime[4] >> datetime[5];
           ssr_time = epoch2time(datetime);
           // go to next line
           continue;
         } else {
+          type = "";
           continue;
         }
       }
