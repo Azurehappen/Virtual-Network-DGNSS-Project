@@ -6,6 +6,7 @@
 #include <cstdarg>
 #include <cstring>
 #include <string>
+#include <iostream>
 #include <cmath>
 #include <time.h>
 #include <cctype>
@@ -63,7 +64,7 @@
 #define FREQ2_GLO   1.24600E9           /* GLONASS G2 base frequency (Hz) */
 #define DFRQ2_GLO   0.43750E6           /* GLONASS G2 bias frequency (Hz/n) */
 #define FREQ3_GLO   1.202025E9          /* GLONASS G3 frequency (Hz) */
-#define FREQ1_CMP   1.561098E9          /* BDS B1I     frequency (Hz) */
+#define FREQ1_CMP   1.561098E9          /* BDS B1-2     frequency (Hz) */
 #define FREQ2_CMP   1.20714E9           /* BDS B2I/B2b frequency (Hz) */
 #define FREQ3_CMP   1.26852E9           /* BDS B3      frequency (Hz) */
 #define SYS_NONE    0x00                /* navigation system: none */

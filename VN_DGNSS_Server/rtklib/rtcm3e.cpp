@@ -570,8 +570,7 @@ static void gen_msm_sig(rtcm_t *rtcm, int sys, int nsat, int nsig, int ncell,
       psrng_s=data->P[j]==0.0?0.0:data->P[j]-rrng[k];
       phrng_s=data->L[j]==0.0||lambda<=0.0?0.0: data->L[j]*lambda-rrng [k];
       rate_s =data->D[j]==0.0||lambda<=0.0?0.0:-data->D[j]*lambda-rrate[k];
-
-      /* subtract phase - psudorange integer cycle offset */
+      // NO cycle slip, mute the following code
       LLI=data->LLI[j];
       if ((LLI&1)||fabs(phrng_s-rtcm->cp[data->sat-1][j])>1171.0) {
         rtcm->cp[data->sat-1][j]=ROUND(phrng_s/lambda)*lambda;
@@ -795,7 +794,7 @@ static int encode_msm1(rtcm_t *rtcm, int sys, int sync)
   i=encode_msm_mod_rrng(rtcm,i,rrng ,nsat ); /* rough range modulo 1 ms */
 
   /* encode msm signal data */
-  i=encode_msm_psrng   (rtcm,i,psrng,ncell); /* fine pseudorange */
+  i=encode_msm_psrng(rtcm,i,psrng,ncell); /* fine pseudorange */
 
   rtcm->nbit=i;
   return 1;

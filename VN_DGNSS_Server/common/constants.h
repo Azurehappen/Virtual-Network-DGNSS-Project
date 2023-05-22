@@ -1,5 +1,9 @@
 #ifndef VN_DGNSS_SERVER_CONSTANTS_H
 #define VN_DGNSS_SERVER_CONSTANTS_H
+#pragma once
+#include <map>
+
+#include "rtklib.h"
 
 #define VN_CODE_GPS_NONE 0
 #define VN_CODE_GPS_C1C 1
@@ -29,4 +33,37 @@
 
 #define VN_MAX_NUM_OF_EPH_EPOCH 10
 
+namespace GnssConstants {
+// Nested map to store wavelength values for each signal
+using VnCodeToWavelenth = std::map<int, double>;
+
+// Map to store signal wavelengths for each GNSS system
+const std::map<int, VnCodeToWavelenth> SysCodeToWavelength = {
+    {SYS_GPS,  // GPS
+     {
+         {VN_CODE_GPS_C1C, CLIGHT / FREQL1},
+         {VN_CODE_GPS_C1W, CLIGHT / FREQL1},
+         {VN_CODE_GPS_C2C, CLIGHT / FREQL2},
+         {VN_CODE_GPS_C2L, CLIGHT / FREQL2},
+         {VN_CODE_GPS_C2W, CLIGHT / FREQL2},
+     }},
+    {SYS_GAL,  // GAL
+     {
+         {VN_CODE_GAL_C1C, CLIGHT / FREQL1},
+         {VN_CODE_GAL_C1X, CLIGHT / FREQL1},
+         {VN_CODE_GAL_C6C, CLIGHT / FREQE6},
+         {VN_CODE_GAL_C5Q, CLIGHT / FREQL5},
+         {VN_CODE_GAL_C5X, CLIGHT / FREQL5},
+         {VN_CODE_GAL_C7Q, CLIGHT / FREQE5b},
+         {VN_CODE_GAL_C7X, CLIGHT / FREQE5b},
+     }},
+    {SYS_CMP,  // BDS
+     {
+         {VN_CODE_BDS_C2I, CLIGHT / FREQ1_CMP},
+         {VN_CODE_BDS_C6I, CLIGHT / FREQ3_CMP},
+         {VN_CODE_BDS_C7, CLIGHT / FREQ2_CMP},
+     }},
+};
+
+}  // namespace GnssConstants
 #endif  // VN_DGNSS_SERVER_CONSTANTS_H

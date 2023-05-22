@@ -171,7 +171,7 @@ static int code2freq_BDS(uint8_t code, double *freq)
 
   switch (obs[0]) {
   case '1': *freq=FREQL1;     return 0; /* B1C */
-  case '2': *freq=FREQ1_CMP; return 0; /* B1I */
+  case '2': *freq=FREQ1_CMP; return 0; /* B1-2 */
   case '7': *freq=FREQ2_CMP; return 1; /* B2I/B2b */
   case '5': *freq=FREQL5;     return 2; /* B2a */
   case '6': *freq=FREQ3_CMP; return 3; /* B3 */

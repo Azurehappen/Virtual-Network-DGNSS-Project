@@ -8,7 +8,8 @@
 #include "epoch_generation_helper.h"
 #include "iggtrop_correction_model.h"
 
-#define SEND_PERIOD 1000000  // Period of server send RTCM: 1s
+#define ONE_SEC_PERIOD 1000000  // 1s
+#define SEND_PERIOD 5000000  // Period of server send RTCM: 5s
 #define MAX_NUM_OF_CLIENTS 128    // Max no. of clients
 #define BUFF_SIZE 1200       // client position buffer size
 #define POSITION_MSG_HEADER "$POSECEF"
@@ -143,9 +144,9 @@ void *pth_handler(void *arg) {
   if (!init_read_pos_client(client_info, client_pos_ecef, infor, client_ip)) {
 //    close(client_info->client_sock.fd);
 //    pthread_exit(nullptr);
-    client_pos_ecef[0] = -2430697.699;
-    client_pos_ecef[1] = -4704189.201;
-    client_pos_ecef[2] = 3544329.103;
+    client_pos_ecef[0] = -2455314.231;
+    client_pos_ecef[1] = -4691596.883;
+    client_pos_ecef[2] = 3543996.389;
     infor.code_F1[0] = VN_CODE_GPS_C1C;
     infor.code_F2[0] = VN_CODE_GPS_C2L;
     infor.code_F1[1] = VN_CODE_GAL_C1C;
@@ -162,11 +163,6 @@ void *pth_handler(void *arg) {
   std::ofstream rst(rst_str.c_str());
   int iter = 0;
   double srtt, endt;
-  std::vector<std::vector<double>> phw_gps_track; // Phase winds up. (not used)
-  phw_gps_track.resize(3);
-  phw_gps_track[0].resize(MAXPRNGPS+1,0);
-  phw_gps_track[1].resize(MAXPRNGAL+1,0);
-  phw_gps_track[2].resize(MAXPRNCMP+1,0);
 
   // transfer
   while (true) {
@@ -186,13 +182,12 @@ void *pth_handler(void *arg) {
     srtt = vntimefunc::GetSystemTimeInSec();
     if (genRTCM.ConstructGnssMeas(client_info->foo_bkg,
                                   client_info->foo_web, rst,
-                                  infor, client_info->TropData,
-                                  phw_gps_track, iter)) {
+                                  infor, client_info->TropData, iter)) {
       genRTCM.SendRtcmMsgToClient(&client_info->client_sock);
     }
     endt = vntimefunc::GetSystemTimeInSec();
     if (client_info->client_sock.send_check){
-      if ((endt - srtt) < SEND_PERIOD)
+      if ((endt - srtt) < ONE_SEC_PERIOD)
         timeperiodic::WaitPeriod(&client_info->periodic);
       else {
         rst << "Warning: Request and Computation time exceed 1s, continue."

@@ -29,8 +29,9 @@ class EpochGenerationHelper {
   bool ConstructGnssMeas(BkgDataRequestor *foo_bkg, WebDataRequestor *foo_web,
                           std::ostream &rst, const GnssSystemInfo & infor,
                           const IggtropExperimentModel & TropData,
-                          std::vector<std::vector<double>> &phw_track,
                           int log_count);
+  void ComputePhaseWindup(int sys_i, int prn_idx, const std::vector<double> &sat_pos_pretrans);
+  void ResetPhaseWindupVec();
   bool SelectSatOrbitCorrection(std::ostream &rst,int prn, int sys,
                   SatOrbitPara &obt_sv, gtime_t &obt_t);
   bool SelectSatClockCorrection(std::ostream &rst,int prn, int sys,
@@ -51,6 +52,7 @@ class EpochGenerationHelper {
   BiasCorrData phase_bias;
   SsrCodeBiasEpoch code_bias_ssr;
   SsrPhaseBiasEpoch phase_bias_ssr;
+  std::vector<std::vector<double>> phase_windup_track;
   std::vector<GnssEphStruct> eph_data;
   gtime_t gpst_now{};
   int day_of_year{};
