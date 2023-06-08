@@ -464,12 +464,7 @@ bool EpochGenerationHelper::ConstructGnssMeas(
 
         // compute Tropospheric delay
         IggtropCorrectionModel IGG;
-        double uLon;
-        if (user_lon <= 0) {
-          uLon = -user_lon;
-        } else {
-          uLon = -user_lon + 2 * PI;
-        }
+        double uLon = user_lon <= 0 ? 2 * PI + user_lon : user_lon;
         double trop_IGG =
             IGG.IGGtropdelay(uLon * R2D, user_lat * R2D, user_h / 1000,
                              day_of_year, user_elev, TropData.data);
