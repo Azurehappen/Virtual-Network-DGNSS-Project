@@ -23,21 +23,26 @@ std::unordered_map<int, std::vector<double>> meo = {
 
 double beidouCodeCorrection::computeBdsCodeCorr(int prn, double ele_deg,
                                                   int bds_code_type) {
-  int tElev = floor((ele_deg / 10.0) + 0.5) + 1;
-  double corr = 0;
+  int tElev = floor(ele_deg / 10.0);
+  double factor = fmod(ele_deg, 10.0) / 10.0;  // fraction for interpolation
+  double corr = 0.0;
+
+  std::unordered_map<int, std::vector<double>>* current_map = nullptr;
+
   if (igso_prn.find(prn) != igso_prn.end()) {
-    // check if key xxx exists in map igso
-    if (igso.find(bds_code_type) != igso.end()) {
-      corr = igso[bds_code_type][tElev];
-    }
+      current_map = &igso;
   } else if (meo_prn.find(prn) != meo_prn.end()) {
-    // check if key xxx exists in map meo
-    if (meo.find(bds_code_type) != meo.end()) {
-      corr = meo[bds_code_type]
-                [tElev];  // Note: The value is derived from the index position
-                          // 'prn' of the vector associated with key 'xxx' in
-                          // the 'meo' map.
-    }
+      current_map = &meo;
+  }
+
+  if (current_map && current_map->find(bds_code_type) != current_map->end()) {
+      std::vector<double>& corrections = (*current_map)[bds_code_type];
+      if (tElev < corrections.size() - 1) {
+          double corr1 = corrections[tElev];
+          double corr2 = corrections[tElev + 1];
+          // Interpolation
+          corr = corr1 + (corr2 - corr1) * factor;
+      }
   }
 
   return corr;
