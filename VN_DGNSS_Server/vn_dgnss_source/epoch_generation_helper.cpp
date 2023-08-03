@@ -506,7 +506,7 @@ bool EpochGenerationHelper::ConstructGnssMeas(
         // Use CNES SSR bias product: code_bias_f1.value
         data[num_sv].P[0] = norm_range - delt_sv +
                             CLIGHT * cbias_ftp_f1[prn].value * 1e-9 +
-                            iono_delay_L1 + trop_IGG;
+                            iono_delay_L1 + trop_IGG - bds_corr;
         int ambiguity = 15;
         if (false && pbias_ftp_f1[prn].prn != -1) {
           data[num_sv].L[0] =
