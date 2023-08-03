@@ -42,6 +42,8 @@ double beidouCodeCorrection::computeBdsCodeCorr(int prn, double ele_deg,
           double corr2 = corrections[tElev + 1];
           // Interpolation
           corr = corr1 + (corr2 - corr1) * factor;
+      } else if (tElev == corrections.size() - 1) {
+          corr = corrections[tElev];
       }
   }
 
