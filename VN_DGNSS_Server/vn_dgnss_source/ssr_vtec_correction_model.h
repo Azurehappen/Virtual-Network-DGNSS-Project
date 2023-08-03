@@ -1,6 +1,4 @@
 
-#ifndef WADGNSS_SERVER_SSR_VTEC_H
-#define WADGNSS_SERVER_SSR_VTEC_H
 #include "bkg_data_requestor.h"
 #include "rtklib.h"
 class SsrVtecCorrectionModel {
@@ -21,5 +19,3 @@ private:
   double _lambdaPP;
   double _lonS;
 };
-
-#endif // WADGNSS_SERVER_SSR_VTEC_H

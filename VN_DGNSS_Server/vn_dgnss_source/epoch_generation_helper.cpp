@@ -4,6 +4,7 @@
 #include <iostream>
 #include <utility>
 
+#include "beidou_code_correction.h"
 #include "ssr_vtec_correction_model.h"
 static void ReportDatetime(std::ostream &rst, std::vector<double> datetime) {
   rst << std::setfill('0') << std::setw(4) << (int)datetime[0] << " "
@@ -362,8 +363,8 @@ bool EpochGenerationHelper::ConstructGnssMeas(
         if (sys_i == 2) {
           if (prn <= 5 || prn == 18 || prn >= 59) {
             if (log_out) {
-              rst << GetSystemTypeStr(sys_rtklib) << prn << " BDS GEO SAT ignored"
-                  << std::endl;
+              rst << GetSystemTypeStr(sys_rtklib) << prn
+                  << " BDS GEO SAT ignored" << std::endl;
             }
             phase_windup_track[sys_i][prn] = 0;
             continue;
@@ -373,7 +374,8 @@ bool EpochGenerationHelper::ConstructGnssMeas(
         if (!(SelectSatOrbitCorrection(rst, prn, sys_rtklib, obt_sv, t_obt) &&
               SelectSatClockCorrection(rst, prn, sys_rtklib, clk_sv, t_clk))) {
           if (log_out) {
-            rst << GetSystemTypeStr(sys_rtklib) << prn << " No IGS corr" << std::endl;
+            rst << GetSystemTypeStr(sys_rtklib) << prn << " No IGS corr"
+                << std::endl;
           }
           phase_windup_track[sys_i][prn] = 0;
           continue;
@@ -414,8 +416,8 @@ bool EpochGenerationHelper::ConstructGnssMeas(
         if (std::abs(eph_tdiff) > 7200.0 + 120.0 || eph_sv[ver][prn].svH != 0 ||
             eph_sv[ver][prn].prn == -1) {
           if (log_out) {
-            rst << GetSystemTypeStr(sys_rtklib) << prn << "(" << eph_sv[ver][prn].prn
-                << ")"
+            rst << GetSystemTypeStr(sys_rtklib) << prn << "("
+                << eph_sv[ver][prn].prn << ")"
                 << " sv_H:" << eph_sv[ver][prn].svH
                 << " time diff: " << eph_tdiff << std::endl;
           }
@@ -423,7 +425,8 @@ bool EpochGenerationHelper::ConstructGnssMeas(
           continue;
         }
         SatPosClkComputer spco(gpst_now, obt_sv.dx_m, obt_sv.dv_m, t_obt,
-                               clk_sv.dt_corr_s, t_clk, eph_sv[ver][prn], sys_rtklib);
+                               clk_sv.dt_corr_s, t_clk, eph_sv[ver][prn],
+                               sys_rtklib);
         // compute propagation time using optimization function
         spco.PropTimeOptm(user_pos);
         // Rotate satellite position
@@ -469,6 +472,12 @@ bool EpochGenerationHelper::ConstructGnssMeas(
             IGG.IGGtropdelay(uLon * R2D, user_lat * R2D, user_h / 1000,
                              day_of_year, user_elev, TropData.data);
 
+        // COmpute Beidou code correction
+        double bds_corr = 0;
+        if (sys_i == 2) {
+          bds_corr = beidouCodeCorrection::computeBdsCodeCorr(
+              prn, user_elev * R2D, infor.code_F1[sys_i]);
+        }
         // ComputePhaseWindup(sys_i, prn, sat_pos_pretrans);
 
         // code/phase bias product from CNE SSR
@@ -512,7 +521,7 @@ bool EpochGenerationHelper::ConstructGnssMeas(
           data[num_sv].lockt[0] = 0;
         }
         data[num_sv].SNR[0] =
-                (unsigned char)(floor(72 * user_elev / (3 * PI)) + 41) * 4;
+            (unsigned char)(floor(72 * user_elev / (3 * PI)) + 41) * 4;
         if (data[num_sv].SNR[0] > 200) {
           data[num_sv].SNR[0] = 200;
         }
@@ -525,12 +534,11 @@ bool EpochGenerationHelper::ConstructGnssMeas(
                               CLIGHT * cbias_ftp_f2[prn].value * 1e-9 +
                               +iono_delay_L2 + trop_IGG;
           if (pbias_ftp_f2[prn].prn != -1) {
-            data[num_sv].L[1] =
-                (norm_range - delt_sv +
-                 CLIGHT * pbias_ftp_f2[prn].value * 1e-9 - iono_delay_L2 +
-                 trop_IGG) /
-                            (CLIGHT / sys_F2) +
-                ambiguity + 2 + phase_windup_track[sys_i][prn];
+            data[num_sv].L[1] = (norm_range - delt_sv +
+                                 CLIGHT * pbias_ftp_f2[prn].value * 1e-9 -
+                                 iono_delay_L2 + trop_IGG) /
+                                    (CLIGHT / sys_F2) +
+                                ambiguity + 2 + phase_windup_track[sys_i][prn];
             data[num_sv].lockt[1] = 1000;
           } else {
             data[num_sv].L[1] = 0;
@@ -541,19 +549,24 @@ bool EpochGenerationHelper::ConstructGnssMeas(
           data[num_sv].SNR[1] = data[num_sv].SNR[0];
         }
         if (log_out) {
-//          rst << " L2 code-phase = " << std::setprecision(5)
-//              << data[num_sv].P[1] - data[num_sv].L[1] * (CLIGHT / sys_F2)
-//              << " phase bias = " << CLIGHT * pbias_ftp_f2[prn].value * 1e-9
-//              << std::endl;
+          //          rst << " L2 code-phase = " << std::setprecision(5)
+          //              << data[num_sv].P[1] - data[num_sv].L[1] * (CLIGHT /
+          //              sys_F2)
+          //              << " phase bias = " << CLIGHT *
+          //              pbias_ftp_f2[prn].value * 1e-9
+          //              << std::endl;
           rst << GetSystemTypeStr(sys_rtklib) << prn
               << " Eph_diff: " << std::setprecision(5) << eph_tdiff << " IODE "
-              << eph_sv[ver][prn].IODE << " L1 code: " << std::setprecision(12)
+              << eph_sv[ver][prn].IODE << " L1 code: "
+              << std::setprecision(12)
               // << data[num_sv].P[0] << " L1 phase: " << std::setprecision(12)
               // << data[num_sv].L[0] << " L2 code: " << std::setprecision(12)
               // << data[num_sv].P[1] << " L2 phase: " << std::setprecision(12)
               << data[num_sv].L[1] << " IGGTrop: " << std::setprecision(4)
-              << trop_IGG << " Iono: " << std::setprecision(5) << iono_delay_L1
-              // << " phw: " << std::setprecision(6) << phase_windup_track[sys_i][prn]
+              << trop_IGG << " Iono: " << std::setprecision(5)
+              << iono_delay_L1
+              // << " phw: " << std::setprecision(6) <<
+              // phase_windup_track[sys_i][prn]
               << std::endl;
         }
         num_in_sys[sys_i]++;
