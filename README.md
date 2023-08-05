@@ -38,7 +38,7 @@ Run VN-DGNSS server: Set the IP address and port
 ```
 ./server (IP) (Port)
 ```
-If you would like to connect it to external network. You may use 'ifconfig' to find your internal IP address. in your router 'port forwarding' setup, forward your internal IP address&port to external port.
+If you would like to connect it to the external network. You may use 'ifconfig' to find your internal IP address. in your router 'port forwarding' setup, forward your internal IP address&port to the external port.
 
 3. Install BKG Ntrip Client  
 Download the BKG software version at 'https://igs.bkg.bund.de/root_ftp/NTRIP/software/'.
@@ -59,18 +59,18 @@ cd bnc-2.12.17-ubuntu-shared
 ```
 
 4. BNC software setup
-* setup the local IP port. Port number 6699 for the **Broadcast Corrections** and 3536 for **RINEX Ephemeris**. Please select the 'version 3' in the **RINEX Ephemeris** tab page. If you would like to change the port numbers, the port numbers configured in the server are also need to be changed.
+* setup the local IP port. Port number 6699 for the **Broadcast Corrections** and 3536 for **RINEX Ephemeris**. Please select 'version 3' on the **RINEX Ephemeris** tab page. If you would like to change the port numbers, the port numbers configured in the server also need to be changed.
 * setup the stream: click **Add Stream** -> **Caster**
 * The recommended NTRIP Caster: Caster host (products.igs-ip.net), Caster port (2101), Ntrip Version (2)
 * Fill in "User" and "Password". (You may need an account for SSR stream usage. Please check http://www.igs-ip.net/home for registration.)
 * Click **Get table**
 * Click an navigation message stream (Defaul: BCEP00BKG0) then click **select**.
-* Click an SSR message stream (Defaul: SSR00CNE0) then click **select**.
+* Click SSR message streams (SSR00CNE0 and SSR00WHU0) then click **select**. (Currently, by default, VN-DGNSS use Orbit/Clock info from WHU and VTEC product from CNES)
 * Run (click **Start**) the BNC software.
 
 ## III. Client Setup
-The excutable file "VN_DGNSS_Client" for Linux (generated from Ubuntu 18.04) is located at VN_DGNSS_Client/bin.
-The excutable file "VN_DGNSS_Client.exe" for Windows (generated from Windows 10) is located at VN_DGNSS_Client/app.
+The executable file "VN_DGNSS_Client" for Linux (generated from Ubuntu 18.04) is located at VN_DGNSS_Client/bin.
+The executable file "VN_DGNSS_Client.exe" for Windows (generated from Windows 10) is located at VN_DGNSS_Client/app.
 
 Please check 'VN_DGNSS_Client/README' for details.
 
@@ -110,12 +110,12 @@ PPP model usage:
 
 ## VII. Implementation Notes
 1. The BKG data stream will provide both I/NAV and F/NAV for Galileo. In terms of IGS SSR standard, this VN-DGNSS server will only support I/NAV ephemeris. 
-2. The RTCM message function originally referred from RTKLIB but modified to our specific purpose. 
-3. No Cycle-Slip function needed since VN-DGNSS only generates the GNSS code measurements. 
-4. Note: In terms of RINEX 3.04. BDS System Time week has a roll-over after 8191. Galileo System Time (GST) week has a roll-over after 4095. currently this code doesn't consider thie roll-over since it valid to after many years. GAL week = GST week + 1024 + n*4096 (n: number of GST roll-overs).
+2. The RTCM message function was originally referred from RTKLIB but was modified to our specific purpose. 
+3. No Cycle-Slip function is needed since VN-DGNSS only generates the GNSS code measurements. 
+4. Note: In terms of RINEX 3.04. BDS System Time Week has a rollover after 8191. Galileo System Time (GST) week has a roll-over after 4095. currently, this code doesn't consider the roll-over since it will be valid after many years. GAL week = GST week + 1024 + n*4096 (n: number of GST roll-overs).
 
 ## VIII. Acknowledge
 The ideas reported herein originated during a project supported by SiriusXM. The client-server implementation project was supported by Caltrans under agreement number 65A0767.
-IGGtrop_SH model data and origianl MATLAB functions are provided by the author of IGGtrop Dr. Wei Li, liwei@whigg.ac.cn.
+IGGtrop_SH model data and original MATLAB functions are provided by the author of IGGtrop Dr. Wei Li, liwei@whigg.ac.cn.
 Some portions of the VN-DGNSS (e.g., RTCM message generator) are modifications of open-source functions in RTKLIB (https://github.com/tomojitakasu/RTKLIB).
-Functions of Spherical Harmonic expansion ionosphere correction model are modifications of functions in BNC (https://igs.bkg.bund.de/ntrip/download).
+Functions of the Spherical Harmonic expansion ionosphere correction model are modifications of functions in BNC (https://igs.bkg.bund.de/ntrip/download).
