@@ -1,5 +1,5 @@
 # Virtual-Network-DGNSS-Project
-This project is the software implementation for a publicly available, open-source, client/server VN-DGNSS implementation with global coverage. The server receives real-time information in SSR format and provides each client with virtual base station RTCM OSR formatted messages applicable to their local vicinity for BeiDou B1, GALILEO E1, and GPS L1. This approach eliminates the need for the client to have physical access to a local reference station.
+This project provides a software implementation for a publicly available, open-source client/server VN-DGNSS system with global coverage. The server receives real-time information in SSR format and supplies clients with virtual base station RTCM OSR formatted messages. The system currently generates OSR messages for GPS L1, BeiDou B1, and Galileo E1. This solution eliminates the need for clients to have access to a local physical reference station.
 
 keywords: PPP, Differential GNSS, Lane-level positioning, Virtual Base Station
 
@@ -9,6 +9,7 @@ Copyright (c) 2020 UC Regents
 
 ## I. Paper
 W. Hu, A. Neupane and J. A. Farrell, "Using PPP Information to Implement a Global Real-Time Virtual Network DGNSS Approach," in IEEE Transactions on Vehicular Technology, 2022, doi: 10.1109/TVT.2022.3187416.
+[Link_Paper](https://ieeexplore.ieee.org/document/9811415)
 
 ## II. Server Setup
 ### System Requirement
@@ -59,7 +60,7 @@ cd bnc-2.12.17-ubuntu-shared
 ```
 
 4. BNC software setup
-* setup the local IP port. Port number 6699 for the **Broadcast Corrections** and 3536 for **RINEX Ephemeris**. Please select 'version 3' on the **RINEX Ephemeris** tab page. If you would like to change the port numbers, the port numbers configured in the server also need to be changed.
+* set up the local IP port. Port number 6699 for the **Broadcast Corrections** and 3536 for **RINEX Ephemeris**. Please select 'version 3' on the **RINEX Ephemeris** tab page. If you would like to change the port numbers, the port numbers configured in the server also need to be changed.
 * setup the stream: click **Add Stream** -> **Caster**
 * The recommended NTRIP Caster: Caster host (products.igs-ip.net), Caster port (2101), Ntrip Version (2)
 * Fill in "User" and "Password". (You may need an account for SSR stream usage. Please check http://www.igs-ip.net/home for registration.)
@@ -112,7 +113,7 @@ PPP model usage:
 1. The BKG data stream will provide both I/NAV and F/NAV for Galileo. In terms of IGS SSR standard, this VN-DGNSS server will only support I/NAV ephemeris. 
 2. The RTCM message function was originally referred from RTKLIB but was modified to our specific purpose. 
 3. No Cycle-Slip function is needed since VN-DGNSS only generates the GNSS code measurements. 
-4. Note: In terms of RINEX 3.04. BDS System Time Week has a rollover after 8191. Galileo System Time (GST) week has a roll-over after 4095. currently, this code doesn't consider the roll-over since it will be valid after many years. GAL week = GST week + 1024 + n*4096 (n: number of GST roll-overs).
+4. Note: In terms of RINEX 3.04. BDS System Time Week has a rollover after 8191. Galileo System Time (GST) week has a rollover after 4095. currently, this code doesn't consider the rollover since it will be valid after many years. GAL week = GST week + 1024 + n*4096 (n: number of GST roll-overs).
 
 ## VIII. Acknowledge
 The ideas reported herein originated during a project supported by SiriusXM. The client-server implementation project was supported by Caltrans under agreement number 65A0767.
