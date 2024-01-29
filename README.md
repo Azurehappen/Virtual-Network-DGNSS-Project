@@ -18,7 +18,8 @@ If you are interested in this work, please cite our [paper](https://ieeexplore.i
   volume={71},
   number={10},
   pages={10337-10349},
-  doi={10.1109/TVT.2022.3187416}}
+  doi={10.1109/TVT.2022.3187416}
+}
 ```
 
 ## II. Code Implementation Contributor
