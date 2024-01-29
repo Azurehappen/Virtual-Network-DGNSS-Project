@@ -8,10 +8,28 @@ Contact: whu027@ucr.edu
 Copyright (c) 2020 UC Regents
 
 ## I. Paper
-W. Hu, A. Neupane and J. A. Farrell, "Using PPP Information to Implement a Global Real-Time Virtual Network DGNSS Approach," in IEEE Transactions on Vehicular Technology, 2022, doi: 10.1109/TVT.2022.3187416.
-[Link_Paper](https://ieeexplore.ieee.org/document/9811415)
+If you are interested in this work, please cite our [paper](https://ieeexplore.ieee.org/document/9811415)
+```
+@article{wang2022using,
+  author={Hu, Wang and Neupane, Ashim and Farrell, Jay A.},
+  journal={IEEE Transactions on Vehicular Technology}, 
+  title={{Using PPP Information to Implement a Global Real-Time Virtual Network DGNSS Approach}}, 
+  year={2022},
+  volume={71},
+  number={10},
+  pages={10337-10349},
+  doi={10.1109/TVT.2022.3187416}}
+```
 
-## II. Server Setup
+## II. Code Implementation Contributor
+* Wang Hu - [GitHub](https://github.com/Azurehappen)
+* Xiaojun Dong - [GitHub](https://github.com/Akatsukis)
+* Ashim Neupane - [GitHub](https://github.com/ashimneu)
+* Dan Vyenielo - [GitHub](https://github.com/dvnlo)
+* Farzana Rahman - [GitHub](https://github.com/FarzanaRahman)
+* Jay Farrell - [GitHub](https://github.com/jaffarrell)
+
+## III. Server Setup
 ### System Requirement
 Ubuntu 18.04
 #### Attention: The executable file provided here was compiled from X86 Linux. If you are using ARM or other architecture, you should compile this project before using it.
@@ -69,13 +87,13 @@ cd bnc-2.12.17-ubuntu-shared
 * Click SSR message streams (SSR00CNE0 and SSR00WHU0) then click **select**. (Currently, by default, VN-DGNSS use Orbit/Clock info from WHU and VTEC product from CNES)
 * Run (click **Start**) the BNC software.
 
-## III. Client Setup
+## IV. Client Setup
 The executable file "VN_DGNSS_Client" for Linux (generated from Ubuntu 18.04) is located at VN_DGNSS_Client/bin.
 The executable file "VN_DGNSS_Client.exe" for Windows (generated from Windows 10) is located at VN_DGNSS_Client/app.
 
 Please check 'VN_DGNSS_Client/README' for details.
 
-## IV. System Architecture
+## V. System Architecture
 ![Server-client](https://user-images.githubusercontent.com/45580484/131876233-beb25066-cfce-431e-8ec3-81182328b99f.png)
 
 PPP model usage:
@@ -85,7 +103,7 @@ PPP model usage:
 * Troposphere correction model: IGGtrop_SH
 
 
-## V. Experimental results
+## VI. Experimental results
 **For detailed descriptions and conclusions, please check Sec. VI in the VN-DGNSS paper.**
 
 <img width="487" alt="Screen Shot 2021-09-02 at 11 53 19 PM" src="https://user-images.githubusercontent.com/45580484/131876595-1893578b-9f5d-4c52-b21b-2a236332e23b.png">
@@ -100,14 +118,6 @@ PPP model usage:
 
 * With dual-band antenna
 ![moving_DF_err](https://user-images.githubusercontent.com/45580484/133939402-ce4681fc-1a77-4f08-9cb8-79598004f1c7.jpg)
-
-## VI. Code Implementation Contributor
-* Wang Hu - [GitHub](https://github.com/Azurehappen)
-* Xiaojun Dong - [GitHub](https://github.com/Akatsukis)
-* Ashim Neupane - [GitHub](https://github.com/ashimneu)
-* Dan Vyenielo - [GitHub](https://github.com/dvnlo)
-* Farzana Rahman - [GitHub](https://github.com/FarzanaRahman)
-* Jay Farrell - [GitHub](https://github.com/jaffarrell)
 
 ## VII. Implementation Notes
 1. The BKG data stream will provide both I/NAV and F/NAV for Galileo. In terms of IGS SSR standard, this VN-DGNSS server will only support I/NAV ephemeris. 
