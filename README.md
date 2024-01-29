@@ -22,7 +22,7 @@ If you are interested in this work, please cite our [paper](https://ieeexplore.i
 }
 ```
 
-## II. Code Implementation Contributor
+## II. Code Implementation Contributors
 * Wang Hu - [GitHub](https://github.com/Azurehappen)
 * Xiaojun Dong - [GitHub](https://github.com/Akatsukis)
 * Ashim Neupane - [GitHub](https://github.com/ashimneu)
