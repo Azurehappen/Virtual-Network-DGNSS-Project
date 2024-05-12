@@ -5,6 +5,8 @@ keywords: PPP, Differential GNSS, Lane-level positioning, Virtual Base Station
 
 Contact: whu027@ucr.edu
 
+Feel free to contact me if you have any questions. Collaboration is greatly welcomed and appreciated.
+
 Copyright (c) 2020 UC Regents
 
 ## I. Paper
